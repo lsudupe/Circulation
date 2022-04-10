@@ -1,0 +1,15 @@
+# Ignore everything
+*
+
+# But not these files...
+!.gitignore
+!*.R
+
+# ...even if they are in subdirectories
+!*/
+
+#Ignore dataset gordos
+
+# Add R files here if they are inside some folders
+# i.e /folder1/folder2/*.R
+.Rproj.user
