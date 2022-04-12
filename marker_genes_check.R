@@ -67,49 +67,27 @@ dev.off()
 
 ###################################################3
 
-pdf(file.path(paths,filename ="Dentritic feature umap.pdf"))
-FeaturePlot(a,features = dentritic)
+#Density plots in clusters
+library(GSEABase)
+##create geneSet
+fibro.sig <- GeneSet(fibroblast, setName="geneSetFibro")
+circulation.sig <- GeneSet(circulation.fibroblast, setName="geneSetCirc")
+geneSets <- GeneSetCollection(fibro.sig, circulation.sig)
+##enrichment
+a@assays[["integrated"]]@counts <- a@assays[["integrated"]]@data
+matrix <- a@assays[["integrated"]]@counts
+#matrix <- as.matrix(matrix)
+ES <- enrichIt(obj = matrix, 
+                      gene.sets = geneSets, 
+                      groups = 1000, cores = 2)
+##save meta
+a <- AddMetaData(a, ES)
+##fibro
+pdf(file.path(paths,filename ="Fibro dens.pdf"))
+print(ridgeEnrichment(a@meta.data, gene.set = "geneSetFibro", group = "seurat_clusters", facet = "sample", add.rug = TRUE))
 dev.off()
-pdf(file.path(paths,filename = "Macrophagues feature umap.pdf"))
-FeaturePlot(a, features = Macrophagues)
-dev.off()
-pdf(file.path(paths,filename = "Schwann.cells feature umap.pdf"))
-FeaturePlot(a, features = Schwann.cells)
-dev.off()
-pdf(file.path(paths,filename ="DC feature umap.pdf"))
-FeaturePlot(a,features = DC.like.cells)
-dev.off()
-pdf(file.path(paths,filename ="Fibro feature umap.pdf"))
-FeaturePlot(a, features = fibroblast)
-dev.off()
-pdf(file.path(paths,filename ="Circulation fibro feature umap.pdf"))
-FeaturePlot(a, features = circulation.fibroblast)
-dev.off()
-pdf(file.path(paths,filename ="Cardiomyocites feature umap.pdf"))
-FeaturePlot(a, features = cardiomyocite)
-dev.off()
-pdf(file.path(paths,filename ="Endohtelial feature umap.pdf"))
-FeaturePlot(a,features = endothelial)
-dev.off()
-pdf(file.path(paths,filename ="Smooth muscle feature umap.pdf"))
-FeaturePlot(a,features = smooth.muscle)
-dev.off()
-pdf(file.path(paths,filename ="B cell feature umap.pdf"))
-FeaturePlot(a,features = B.cell)
-dev.off()
-pdf(file.path(paths,filename ="Machofage/monocytes feature umap.pdf"))
-FeaturePlot(a,features = machofage.monocytes)
-dev.off()
-pdf(file.path(paths,filename ="T cells feature umap.pdf"))
-FeaturePlot(a,features = T.cell)
-dev.off()
-pdf(file.path(paths,filename ="Neutrophils feature umap.pdf"))
-FeaturePlot(a, features = neutrophils)
-dev.off()
-pdf(file.path(paths,filename ="Dentritic feature umap.pdf"))
-FeaturePlot(a,features = dentritic)
-dev.off()
-pdf(file.path(paths,filename ="Granulocytes feature umap.pdf"))
-FeaturePlot(a, features = granulocytes)
+
+pdf(file.path(paths,filename ="circ dens.pdf"))
+print(ridgeEnrichment(a@meta.data, gene.set = "geneSetCirc", group = "seurat_clusters", facet = "sample", add.rug = TRUE))
 dev.off()
 
