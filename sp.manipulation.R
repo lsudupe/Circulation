@@ -19,8 +19,8 @@ spatial <- readRDS("./objects/integrated/integrated.gfp.rds")
 spatial@meta.data[["ident"]] <- spatial@meta.data[["seurat_clusters"]]
 Seurat::Idents(object = spatial) <- spatial@meta.data[["ident"]]
 
-spatial.fb <- subset(x = spatial, idents = c("1","4","5","6"))
-spatial.no.fb <- subset(x = spatial, idents = c("0","2","3","7","8"))
+spatial.fb <- subset(x = spatial, idents = c("1","4","5","6","8"))
+spatial.no.fb <- subset(x = spatial, idents = c("0","2","3","7"))
 
 spatial.fb@meta.data[["ident"]] <- spatial.fb@active.ident
 spatial.no.fb@meta.data[["ident"]] <- spatial.no.fb@active.ident
