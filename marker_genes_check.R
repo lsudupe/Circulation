@@ -95,12 +95,13 @@ dev.off()
 DefaultAssay(a) <- "SCT"
   
 for (i in circulation.fibroblast){
-  #p1 <- SpatialFeaturePlot(integrated, features = i, alpha = 0.6, combine = FALSE)
+  p1 <- SpatialFeaturePlot(a, features = i, combine = FALSE)
   #fix.p1 <- scale_fill_continuous(type = "viridis")
-  #p2 <- lapply(p1, function (x) x + fix.p1)
+  fix.p1 <- scale_fill_viridis_c()
+  p2 <- lapply(p1, function (x) x + fix.p1)
   
-  pdf(paste("D2",i,".pdf",sep=""))
-  #print(CombinePlots(p2))
-  SpatialFeaturePlot(a, features = i, alpha = 0.6, combine = FALSE)
+  pdf(paste("circulation",i,".pdf",sep=""))
+  print(CombinePlots(p2))
+  #print(SpatialPlot(a, features = i,combine = FALSE))
   dev.off()
 }
