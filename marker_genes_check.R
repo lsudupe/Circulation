@@ -91,3 +91,16 @@ pdf(file.path(paths,filename ="circ dens.pdf"))
 print(ridgeEnrichment(a@meta.data, gene.set = "geneSetCirc", group = "seurat_clusters", facet = "sample", add.rug = TRUE))
 dev.off()
 
+#####check same of them spatially
+DefaultAssay(a) <- "SCT"
+  
+for (i in circulation.fibroblast){
+  #p1 <- SpatialFeaturePlot(integrated, features = i, alpha = 0.6, combine = FALSE)
+  #fix.p1 <- scale_fill_continuous(type = "viridis")
+  #p2 <- lapply(p1, function (x) x + fix.p1)
+  
+  pdf(paste("D2",i,".pdf",sep=""))
+  #print(CombinePlots(p2))
+  SpatialFeaturePlot(a, features = i, alpha = 0.6, combine = FALSE)
+  dev.off()
+}
