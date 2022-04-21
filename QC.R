@@ -9,12 +9,12 @@ library(ggplot2)
 
 #Data--------------------------------------
 control <- readRDS("./objects/initial/control_sp.rds")
-infarto_3dpi <- readRDS("./objects/initial/3dpi_sp.rds")
-infarto_5dpi_h <- readRDS("./objects/initial/5dpi_h_sp.rds")
-infarto_5dpi_m <- readRDS("./objects/initial/5dpi_m_sp.rds")
+dpi3 <- readRDS("./objects/initial/3dpi_sp.rds")
+dpi5_female <- readRDS("./objects/initial/5dpi_h_sp.rds")
+dpi5_male <- readRDS("./objects/initial/5dpi_m_sp.rds")
 
-samples <- c(control, infarto_3dpi, infarto_5dpi_h, infarto_5dpi_m)
-names(samples) <- c("control", "3dpi", "5dpi_h", "5dpi_m")
+samples <- c(control, dpi3, dpi5_female, dpi5_male)
+names(samples) <- c("control", "dpi3", "dpi5_female", "dpi5_male")
 
 for (i in 1:length(samples)){
   a <- samples[[i]]
@@ -29,13 +29,18 @@ for (i in 1:length(samples)){
 }
 
 control <- readRDS("./objects/initial/control_sp.rds")
-infarto_3dpi <- readRDS("./objects/initial/3dpi_sp.rds")
-infarto_5dpi_h <- readRDS("./objects/initial/5dpi_h_sp.rds")
-infarto_5dpi_m <- readRDS("./objects/initial/5dpi_m_sp.rds")
+dpi3 <- readRDS("./objects/initial/dpi3_sp.rds")
+dpi5_female <- readRDS("./objects/initial/dpi5_female_sp.rds")
+dpi5_male <- readRDS("./objects/initial/dpi5_male_sp.rds")
+
+control@meta.data[["sample"]] <- "control"
+dpi3@meta.data[["sample"]] <- "dpi3"
+dpi5_female@meta.data[["sample"]] <- "dpi5_female"
+dpi5_male@meta.data[["sample"]] <- "dpi5_male"
 
 ##Merge them
-combined <- merge(control, y = c(infarto_3dpi, infarto_5dpi_h, infarto_5dpi_m ), 
-                     add.cell.ids = c("control","3dpi","5dpi_h", "5dpi_m"), project = "Circulation")
+combined <- merge(control, y = c(dpi3, dpi5_female, dpi5_male ), 
+                     add.cell.ids = c("control","dpi3","dpi5_female", "dpi5_male"), project = "Circulation")
 
 ##Visualization
 # Visualize the number of spots counts per sample
@@ -158,22 +163,24 @@ combined.meta %>%
 dev.off()
 
 FeatureScatter(control, feature1 = "nCount_Spatial", feature2 = "nFeature_Spatial")
-FeatureScatter(infarto_3dpi, feature1 = "nCount_Spatial", feature2 = "nFeature_Spatial")
-FeatureScatter(infarto_5dpi_h, feature1 = "nCount_Spatial", feature2 = "nFeature_Spatial")
-FeatureScatter(infarto_5dpi_m, feature1 = "nCount_Spatial", feature2 = "nFeature_Spatial")
+FeatureScatter(dpi3, feature1 = "nCount_Spatial", feature2 = "nFeature_Spatial")
+FeatureScatter(dpi5_female, feature1 = "nCount_Spatial", feature2 = "nFeature_Spatial")
+FeatureScatter(dpi5_male, feature1 = "nCount_Spatial", feature2 = "nFeature_Spatial")
 
 ####filter and save combined data
 
-combined <- subset(combined, subset = nFeature_Spatial > 300 & nFeature_Spatial < 5500 & percent_mito < 50)
+combined <- subset(combined, subset = nFeature_Spatial > 200 & nFeature_Spatial < 5500 & percent_mito < 50)
 saveRDS(combined, "./objects/initial/combined_sp.rds")
 
 
-control <- subset(control, subset = nFeature_Spatial > 300 & nFeature_Spatial < 5500 & percent_mito < 50)
-infarto_3dpi <- subset(infarto_3dpi, subset = nFeature_Spatial > 300 & nFeature_Spatial < 5500 & percent_mito < 50)
-infarto_5dpi_h <- subset(infarto_5dpi_h, subset = nFeature_Spatial > 300 & nFeature_Spatial < 5500 & percent_mito < 50)
-infarto_5dpi_m <- subset(infarto_5dpi_m, subset = nFeature_Spatial > 300 & nFeature_Spatial < 5500 & percent_mito < 50)
+control <- subset(control, subset = nFeature_Spatial > 200 & nFeature_Spatial < 5500 & percent_mito < 50)
+dpi3 <- subset(dpi3, subset = nFeature_Spatial > 200 & nFeature_Spatial < 5500 & percent_mito < 50)
+dpi5_female <- subset(dpi5_female, subset = nFeature_Spatial > 200 & nFeature_Spatial < 5500 & percent_mito < 50)
+dpi5_male <- subset(dpi5_male, subset = nFeature_Spatial > 200 & nFeature_Spatial < 5500 & percent_mito < 50)
 
 saveRDS(control,"./objects/initial/control_sp.rds")
-saveRDS(infarto_3dpi,"./objects/initial/3dpi_sp.rds")
-saveRDS(infarto_5dpi_h,"./objects/initial/5dpi_h_sp.rds")
-saveRDS(infarto_5dpi_m,"./objects/initial/5dpi_m_sp.rds")
+saveRDS(dpi3,"./objects/initial/dpi3_sp.rds")
+saveRDS(dpi5_female,"./objects/initial/dpi5_female_sp.rds")
+saveRDS(dpi5_male,"./objects/initial/dpi5_male_sp.rds")
+
+
