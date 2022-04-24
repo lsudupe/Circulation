@@ -7,6 +7,45 @@ library(Seurat)
 library(dplyr)
 library(ggplot2)
 
+###Read data
+combined <- readRDS("./objects/initial/combined_noGFP.rds")
+
+###Integration
+###https://satijalab.org/seurat/articles/integration_introduction.html#performing-integration-on-datasets-normalized-with-sctransform-1
+list <- SplitObject(combined, split.by = "sample")
+saveRDS(list, "./objects/initial/list_sp.rds")
+list <- lapply(X = list, FUN = SCTransform, assay="Spatial")
+features <- SelectIntegrationFeatures(object.list = list, nfeatures = 3000)
+list <- PrepSCTIntegration(object.list = list, anchor.features = features)
+
+
+anchors <- FindIntegrationAnchors(object.list = list, normalization.method = "SCT",
+                                  anchor.features = features)
+combined <- IntegrateData(anchorset = anchors, normalization.method = "SCT")
+
+saveRDS(combined, "./objects/processed/integrated.rds")
+integrated <- readRDS("./objects/processed/integrated.rds")
+
+
+###Transformation
+
+integrated <- RunPCA(integrated, assay = "integrated",npcs = 30, verbose = FALSE) %>%
+  RunUMAP(reduction = "pca", dims = 1:30, verbose = FALSE)%>%
+  FindNeighbors(reduction = "pca", dims = 1:30) %>%
+  FindClusters(resolution = 0.5)
+
+saveRDS(integrated, "./objects/processed/integrated.sct.rds")
+
+###Markers
+
+markers <- Seurat::FindAllMarkers(object = integrated, 
+                                  assay = "integrated",
+                                  slot = "data",
+                                  verbose = TRUE, 
+                                  only.pos = TRUE)
+
+saveRDS(markers, "./results/integrated_markers.rds")
+
 ###Data
 integrated <- readRDS("./objects/integrated/integrated.gfp.rds")
 
@@ -24,35 +63,6 @@ pdf(file.path("./results/clusters/",filename = "spatial_integrated.pdf"))
 SpatialPlot(integrated, group.by = c("seurat_clusters"),label = TRUE, combine = FALSE)
 dev.off()
 
-
-###Individual GFP plots
-pdf(file.path("./results/gfp/",filename = "sham_gfp.pdf"))
-SpatialPlot(object = control, features = c("GFP")) 
-dev.off()
-
-SpatialPlot(object = infarto_3dpi, features = c("GFP"))
-SpatialPlot(object = infarto_5dpi_h, features = c("GFP"))
-SpatialPlot(object = infarto_5dpi_m, features = c("GFP"))
-
-
-pdf(file.path("./results/gfp/",filename = "3dpi_gfp.pdf"))
-SpatialFeaturePlot(infarto_3dpi, features = "GFP",
-                   min.cutoff = 0,
-                   max.cutoff = 60,)
-dev.off()
-
-pdf(file.path("./results/gfp/",filename = "5dpi_h_gfp.pdf"))
-SpatialFeaturePlot(infarto_5dpi_h, features = "GFP",
-                   min.cutoff = 0,
-                   max.cutoff = 80,)
-dev.off()
-
-
-pdf(file.path("./results/gfp/",filename = "5dpi_m_gfp.pdf"))
-SpatialFeaturePlot(infarto_5dpi_m, features = "GFP",
-                   min.cutoff = 0,
-                   max.cutoff = 100,)
-dev.off()
 
 
 
