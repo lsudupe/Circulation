@@ -23,8 +23,8 @@ anchors <- FindIntegrationAnchors(object.list = list, normalization.method = "SC
                                   anchor.features = features)
 combined <- IntegrateData(anchorset = anchors, normalization.method = "SCT")
 
-saveRDS(combined, "./objects/processed/integrated.rds")
-integrated <- readRDS("./objects/processed/integrated.rds")
+saveRDS(combined, "./objects/integrated/integrated.rds")
+integrated <- readRDS("./objects/integrated/integrated.rds")
 
 
 ###Transformation
@@ -32,9 +32,9 @@ integrated <- readRDS("./objects/processed/integrated.rds")
 integrated <- RunPCA(integrated, assay = "integrated",npcs = 30, verbose = FALSE) %>%
   RunUMAP(reduction = "pca", dims = 1:30, verbose = FALSE)%>%
   FindNeighbors(reduction = "pca", dims = 1:30) %>%
-  FindClusters(resolution = 0.5)
+  FindClusters(resolution = 0.4)
 
-saveRDS(integrated, "./objects/processed/integrated.sct.rds")
+saveRDS(integrated, "./objects/integrated/integrated.sct.rds")
 
 ###Markers
 
@@ -45,9 +45,6 @@ markers <- Seurat::FindAllMarkers(object = integrated,
                                   only.pos = TRUE)
 
 saveRDS(markers, "./results/integrated_markers.rds")
-
-###Data
-integrated <- readRDS("./objects/integrated/integrated.gfp.rds")
 
 ###Plots
 
