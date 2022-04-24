@@ -20,7 +20,7 @@ library("SPOTlight")
 library("base")
 
 ##Data-----------------------------------------------------
-integrated <- readRDS("./objects/integrated/integrated.gfp.rds")
+integrated <- readRDS("./objects/integrated/integrated.sct.rds")
 fibro.ref <- sc.ref <- readRDS("./objects/sc/Tokio/sc.combined.sct.fibro.rds")
 
 ##marker genes 
@@ -37,7 +37,7 @@ sc_markers <- readRDS("./results/spotlight/marker_genes/combined.fibro_markers.R
 #Decomposition fibro.ref
 spot_SCT <- spotlight_deconvolution(
   se_sc = fibro.ref,
-  counts_spatial = combined@assays[["integrated"]]@counts,
+  counts_spatial = combined@assays[["Spatial"]]@counts,
   clust_vr = "seurat_clusters", # Variable in sc_seu containing the cell-type annotation
   cluster_markers = sc_markers, # Dataframe with the marker genes
   cl_n = 100, # number of cells per cell type to use
@@ -48,19 +48,7 @@ spot_SCT <- spotlight_deconvolution(
   min_cont = 0 # Remove those cells contributing to a spot below a certain threshold 
 )
 
-install.packages("remotes")
-remotes::install_github("MarioniLab/scran")
-library("scran")
 
-
-DefaultAssay(sc.ref) <- "integrated"
-DefaultAssay(integrated) <- "RNA"
-res <- SPOTlight(
-  x = fibro.ref,
-  y = integrated,
-  mgs = cluster_markers_fibro)
-
-saveRDS(object = spot_SCT, file = here::here("./results/spotlight/spot_integrated_fibro.rds"))
 
 
 
