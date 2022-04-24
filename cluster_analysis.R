@@ -61,6 +61,20 @@ SpatialPlot(integrated, group.by = c("seurat_clusters"),label = TRUE, combine = 
 dev.off()
 
 
+###Markers circulation
 
+circulation <- readRDS("./objects/sc/Tokio/IRCF.groups.rds")
+
+circulation@active.ident <- circulation@meta.data[["integrated_snn_res.0.8"]]
+Seurat::Idents(object = circulation) <- circulation@active.ident
+
+
+markers <- Seurat::FindAllMarkers(object = circulation, 
+                                  assay = "SCT",
+                                  slot = "data",
+                                  verbose = TRUE, 
+                                  only.pos = TRUE)
+
+saveRDS(markers, "./results/circulation_markers.rds")
 
 
