@@ -167,20 +167,52 @@ FeatureScatter(dpi3, feature1 = "nCount_Spatial", feature2 = "nFeature_Spatial")
 FeatureScatter(dpi5_female, feature1 = "nCount_Spatial", feature2 = "nFeature_Spatial")
 FeatureScatter(dpi5_male, feature1 = "nCount_Spatial", feature2 = "nFeature_Spatial")
 
-####filter and save combined data
 
-combined <- subset(combined, subset = nFeature_Spatial > 200 & nFeature_Spatial < 5500 & percent_mito < 50)
-saveRDS(combined, "./objects/initial/combined_sp.rds")
+#####Check GFP#############################################################
+library("GiNA")
+myPalette <- colorRampPalette(rev(brewer.pal(11, "Spectral")))
 
+p1 <- SpatialFeaturePlot(object = combined, 
+                         features = c("GFP"),
+                         combine = FALSE) 
+fix.p1 <- scale_fill_gradientn(colors=myPalette(100),
+                               limits = c(0,300),
+                               breaks=c(0,300),
+                               labels=c("Min","Max"),)
+p2 <- lapply(p1, function (x) x + fix.p1)
 
-control <- subset(control, subset = nFeature_Spatial > 200 & nFeature_Spatial < 5500 & percent_mito < 50)
-dpi3 <- subset(dpi3, subset = nFeature_Spatial > 200 & nFeature_Spatial < 5500 & percent_mito < 50)
-dpi5_female <- subset(dpi5_female, subset = nFeature_Spatial > 200 & nFeature_Spatial < 5500 & percent_mito < 50)
-dpi5_male <- subset(dpi5_male, subset = nFeature_Spatial > 200 & nFeature_Spatial < 5500 & percent_mito < 50)
+pdf(file.path("./results/gfp/",filename = "combined_gfp.pdf"))
+print(CombinePlots(p2))
+dev.off()
 
-saveRDS(control,"./objects/initial/control_sp.rds")
-saveRDS(dpi3,"./objects/initial/dpi3_sp.rds")
-saveRDS(dpi5_female,"./objects/initial/dpi5_female_sp.rds")
-saveRDS(dpi5_male,"./objects/initial/dpi5_male_sp.rds")
+#Take out GFP for the integration#########################
+samples <- c(control, dpi3, dpi5_female, dpi5_male)
+names(samples) <- c("control", "dpi3", "dpi5_female", "dpi5_male")
 
+for (i in 1:length(samples)){
+  a <- samples[[i]]
+  counts <- as.data.frame(a@assays[["Spatial"]]@counts)
+  counts <- counts[row.names(counts) != "GFP", , drop = FALSE]
+  counts <- as.matrix(counts)
+  a@assays[["Spatial"]]@counts <- counts
+  
+  data <- as.data.frame(a@assays[["Spatial"]]@data)
+  data <- data[row.names(data) != "GFP", , drop = FALSE]
+  data <- as.matrix(data)
+  a@assays[["Spatial"]]@data <- data
+  
+  ##save object
+  saveRDS(a,file = paste0("./objects/initial/",names(samples[i]),"_noGFP.rds"))
+}
 
+control <- readRDS("./objects/initial/control_noGFP.rds")
+dpi3 <- readRDS("./objects/initial/dpi3_noGFP.rds")
+dpi5_female <- readRDS("./objects/initial/dpi5_female_noGFP.rds")
+dpi5_male <- readRDS("./objects/initial/dpi5_male_noGFP.rds")
+
+##Merge them
+combined <- merge(control, y = c(dpi3, dpi5_female, dpi5_male ), 
+                  add.cell.ids = c("control","dpi3","dpi5_female", "dpi5_male"), project = "Circulation")
+
+#####save combined
+saveRDS(combined,"./objects/initial/combined_noGFP.rds")
