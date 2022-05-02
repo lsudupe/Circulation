@@ -15,7 +15,7 @@ library("dittoSeq")
 library("dichromat")
 
 ##CHOOSE THE auxMaxRank
-genes.porcentage <-  750#porcentage depending number of genes in spatial
+genes.porcentage <-  210#porcentage depending number of genes in spatial
 
 ###### Read the gene sets
 genes.velocity <- read.csv("./data/genes_velocity.csv", header = TRUE, sep = ",")
@@ -27,10 +27,10 @@ D2[D2 == ""] <- NA
 D2 <- D2[!is.na(D2)]
 
 ###### Create genesets
-b.sig <- GeneSet(B, setName="geneSetB")
+#b.sig <- GeneSet(B, setName="geneSetB")
 d1.sig <- GeneSet(D1, setName="geneSetD1")
 d2.sig <- GeneSet(D2, setName="geneSetD2")
-geneSets <- GeneSetCollection(b.sig,d1.sig, d2.sig)
+geneSets <- GeneSetCollection(d1.sig, d2.sig)#,b.sig)
 
 ###### Download  data
 #a <- readRDS("../data/circulation_spatial/integrated.gfp.b.rds")
@@ -50,15 +50,16 @@ no.fibro.new.counts <- GetAssayData(no.fibro@assays[["SCT"]])[b.no.fibro,]
 #no.fibro[["B"]] <- CreateAssayObject(counts = no.fibro.new.counts)
 no.fibro.new <- CreateSeuratObject(counts =no.fibro.new.counts, assay = "RNA")
 
-objects <- c(fibro, no.fibro)
+#objects <- c(fibro, no.fibro)
+objects <- c(fibro.new, no.fibro.new)
 names(objects) <- c("fibro", "no.fibro")
 
 ###############################################333
 for (i in 1:length(objects)){
           ###matrix
           a <- objects[[i]]
-          a@assays[["SCT"]]@counts <- a@assays[["SCT"]]@data
-          matrix <- a@assays[["SCT"]]@counts
+          a@assays[["RNA"]]@counts <- a@assays[["RNA"]]@data
+          matrix <- a@assays[["RNA"]]@counts
           matrix <- as.matrix(matrix)
           ###### AUC score 
           cells_rankings <- AUCell_buildRankings(matrix, nCores=1)#, plotStats=TRUE)
@@ -88,7 +89,7 @@ for (i in 1:length(objects)){
           #d1.d2[is.na(d1.d2)] = 0
           #a@meta.data[["relation_log(d1.d2)"]] <- d1.d2
           ##save object
-          saveRDS(a,file = paste0("./results/Aucell/all_genes/",names(objects[i]),".rds"))
+          saveRDS(a,file = paste0("./results/Aucell/B_genes/",names(objects[i]),".B.rds"))
           #feature_plot
           #p1 <- SpatialFeaturePlot(a, features = "nCount_SCT", combine = FALSE)
           #fix.p1 <- scale_fill_continuous(limits = c(0,25000), 
@@ -104,8 +105,8 @@ for (i in 1:length(objects)){
 
 ###################################################PLOTS
 
-fibro.new <- readRDS("./results/Aucell/all_genes/fibro.rds")
-no.fibro.new <- readRDS("./results/Aucell/all_genes/no.fibro.rds")
+fibro.new <- readRDS("./results/Aucell/B_genes/fibro.B.rds")
+no.fibro.new <- readRDS("./results/Aucell/B_genes/no.fibro.rds")
 
 ####add image info
 fibro.new@images <- fibro@images
@@ -119,18 +120,18 @@ no.fibro.new@reductions <- no.fibro@reductions
 
 #Density plots
 
-dens <- c("geneSetB","geneSetD1","geneSetD2", "relation_log.d1.d2")
+dens <- c("geneSetD1","geneSetD2", "relation_log.d1.d2")#,"geneSetB")
 
 ##fibro
 for (i in dens){
-  pdf(file.path("./results/Aucell/all_genes/",filename = paste(i,"dens.fibro.all.pdf",sep="")))
+  pdf(file.path("./results/Aucell/B_genes/",filename = paste(i,"dens.fibro.B.pdf",sep="")))
   print(dittoRidgePlot(fibro.new, i, group.by = "sample"))
   dev.off()
 }
 
 ##no fibro
 for (i in dens){
-  pdf(file.path("./results/Aucell/all_genes/",filename = paste(i,"dens.no.fibro.all.pdf",sep="")))
+  pdf(file.path("./results/Aucell/B_genes/",filename = paste(i,"dens.no.fibro.B.pdf",sep="")))
   print(dittoRidgePlot(no.fibro.new, i, group.by = "sample"))
   dev.off()
 }
@@ -141,19 +142,21 @@ re <- colorRampPalette(c("mistyrose", "red2","darkred"))(200)
 library("GiNA")
 myPalette <- colorRampPalette(rev(brewer.pal(11, "Spectral")))
 
-feature.list <- c("geneSetB","geneSetD1","geneSetD2")
-b <- c(0.08,0.3)
+feature.list <- c("geneSetD1","geneSetD2")#,"geneSetB")
+b <- c(0.45,0.65)
+feature.list <- c("geneSetD2")
+b <- c(0.4,0.6)
 feature.list <- c("relation_log.d1.d2")
-b <- c(-0.1,0.9)
+b <- c(-0.1,0.2)
 
 
 for (i in feature.list){
   p1 <- SpatialFeaturePlot(fibro.new, features = i, combine = FALSE)
-  fix.p1 <- scale_fill_gradientn(colours=c(bl,"white", re), na.value = "grey98",limits = b,breaks=b, labels = c("min", "max"))
-  #fix.p1 <- scale_fill_gradientn(colours=myPalette(100),breaks=b, labels = c("min", "max"),limits = b)
+  #fix.p1 <- scale_fill_gradientn(colours=c(bl,"white", re), na.value = "grey98",limits = b,breaks=b, labels = c("min", "max"))
+  fix.p1 <- scale_fill_gradientn(colours=myPalette(100),breaks=b, labels = c("min", "max"),limits = b)
   p2 <- lapply(p1, function (x) x + fix.p1)
   
-  pdf(file.path("./results/Aucell/all_genes/",filename = paste(i,"spatial.all.pdf",sep="")))
+  pdf(file.path("./results/Aucell/B_genes/",filename = paste(i,"spatial.B.pdf",sep="")))
   print(CombinePlots(p2))
   dev.off()
 }
@@ -180,9 +183,9 @@ library(hrbrthemes)
 
 fibro.new.meta <- fibro.new@meta.data
 fibro.new.control <- fibro.new.meta[grepl("control", fibro.new.meta[,4]),]
-fibro.new.3dpi <- fibro.new.meta[grepl("3dpi", fibro.new.meta[,4]),]
-fibro.new.5.dpi.female <- fibro.new.meta[grepl("5dpi_female", fibro.new.meta[,4]),]
-fibro.new.5.dpi.male <- fibro.new.meta[grepl("5dpi_male", fibro.new.meta[,4]),]
+fibro.new.3dpi <- fibro.new.meta[grepl("3dpi", fibro.new.meta[,6]),]
+fibro.new.5.dpi.female <- fibro.new.meta[grepl("5dpi_female", fibro.new.meta[,6]),]
+fibro.new.5.dpi.male <- fibro.new.meta[grepl("5dpi_male", fibro.new.meta[,6]),]
 
 
 # "geneSetB","geneSetD1","geneSetD2","relation_log.d1.d2")
@@ -201,8 +204,8 @@ dev.off()
 
 ####scaterplot
 
-pdf("scaterplott.5dpi_male.d1.d22.pdf")
-ggplot(fibro.new.5.dpi.male, aes(x=geneSetD2, y=relation_log.d1.d2, shape=ident, color=ident)) +
+pdf(file.path("./results/Aucell/all_genes/",filename = paste("scaterplot.3dpi.d1.d2.pdf")))
+ggplot(fibro.new.3dpi, aes(x=geneSetD1, y=geneSetD2, shape=ident, color=ident)) +
   geom_point() + 
   geom_smooth(method=lm, se=FALSE, fullrange=TRUE)
 dev.off()
@@ -225,6 +228,8 @@ for (i in genes){
   print(CombinePlots(p2))
   dev.off()
 }
+
+
 
 
 
