@@ -15,19 +15,19 @@ control <- Load10X_Spatial(data.dir = "./data/control/",
 infarto_3dpi <- Load10X_Spatial(data.dir = "./data/infarto_3dpi/",
                            filename = "filtered_feature_bc_matrix.h5",
                            assay = "Spatial",
-                           slice = "dpi_3",
+                           slice = "dpi3",
                            filter.matrix = TRUE)
 
 infarto_5dpi_h <- Load10X_Spatial(data.dir = "./data/infarto_5dpi_hembra/",
                                 filename = "filtered_feature_bc_matrix.h5",
                                 assay = "Spatial",
-                                slice = "dpi_5_female",
+                                slice = "dpi5_female",
                                 filter.matrix = TRUE)
 
 infarto_5dpi_m <- Load10X_Spatial(data.dir = "./data/infarto_5dpi_macho/",
                                   filename = "filtered_feature_bc_matrix.h5",
                                   assay = "Spatial",
-                                  slice = "dpi_5_male",
+                                  slice = "dpi5_male",
                                   filter.matrix = TRUE)
 ###########################################################
 #save objects
