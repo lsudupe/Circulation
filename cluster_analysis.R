@@ -23,8 +23,8 @@ anchors <- FindIntegrationAnchors(object.list = list, normalization.method = "SC
                                   anchor.features = features)
 combined <- IntegrateData(anchorset = anchors, normalization.method = "SCT")
 
-saveRDS(combined, "./objects/integrated/integrated.rds")
-integrated <- readRDS("./objects/integrated/integrated.rds")
+saveRDS(combined, "./objects/integrated/integrated.GFP.rds")
+integrated <- readRDS("./objects/integrated/integrated.GFP.rds")
 
 
 ###Transformation
@@ -34,7 +34,7 @@ integrated <- RunPCA(integrated, assay = "integrated",npcs = 30, verbose = FALSE
   FindNeighbors(reduction = "pca", dims = 1:30) %>%
   FindClusters(resolution = 0.4)
 
-saveRDS(integrated, "./objects/integrated/integrated.sct.rds")
+saveRDS(integrated, "./objects/integrated/integrated.sct.GFP.rds")
 
 ###Markers
 
