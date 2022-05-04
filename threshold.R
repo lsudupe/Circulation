@@ -82,7 +82,7 @@ spatial_min_0 <- spatial
 decon_mtrx_sub_min_0 <- decon_mtrx_sub
 decon_mtrx_min0 <- decon_mtrx
 
-decon_mtrx_sub_min_0[decon_mtrx_sub_min_0 < 0.5] <- 0
+decon_mtrx_sub_min_0[decon_mtrx_sub_min_0 < 0.0] <- 0
 decon_mtrx_min0 <- cbind(decon_mtrx_sub_min_0, "res_ss" = decon_mtrx_min0[, "res_ss"])
 
 decon_df_min0 <- decon_mtrx_min0 %>%
@@ -96,20 +96,20 @@ spatial_min_0@meta.data <- spatial_min_0@meta.data %>%
 #####################
 
 
-matrix <- as.data.frame(decon_mtrx)
-matrix["samples"] <- data[,4]
+matrix <- as.data.frame(decon_df_min0)
+matrix["samples"] <- spatial@meta.data[["sample"]]
 matrix$res_ss <- NULL
 
-control <- matrix[grepl("control", matrix[,3]),]
-counts.control <- as.vector(control$no.FB)
-counts.all <- as.vector(data$var.data)
+
+control <- matrix[grepl("control", matrix[,4]),]
+counts.control <- as.vector(control$FB)
+
+quantile <- quantile(counts.control, probs = c(0.99)) #0.519 es 99% fb, 0.658 no fb 99, 0.481 no.fib 0.01%
 
 
-quantile <- quantile(counts.control, probs = c(0.01)) #0.519 es 99% fb, 0.658 no fb 99, 0.481 no.fib 0.01%
-
-i <- "no.FB"
-pdf(file.path("./results/threshold/",filename = paste(i,"threshold.sample.line.deco.0.0.no.fibro.pdf",sep="")))
-print(dittoRidgePlot(spatial_min_0, i, group.by = "sample",add.line = 0.481))#,min=0, max=100))#,split.by = "sample"))
+i <- "FB"
+pdf(file.path("./results/threshold/",filename = paste(i,"deco.0.0.fibro.cluster.threshold.pdf",sep="")))
+print(dittoRidgePlot(spatial_min_0, i, group.by = "seurat_clusters",add.line = 0.519,split.by = "sample",min=0.15, max=0.8))#
 dev.off()
 
 
