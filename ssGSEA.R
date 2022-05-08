@@ -8,6 +8,7 @@
 ###### libraries
 library("Seurat")
 library("escape")
+#install.packages("GSEABase")
 library("GSEABase")
 library("dittoSeq")
 library("ggplot2")
@@ -29,14 +30,12 @@ D2 <- D2[!is.na(D2)]
 b.sig <- GeneSet(B, setName="geneSetB")
 d1.sig <- GeneSet(D1, setName="geneSetD1")
 d2.sig <- GeneSet(D2, setName="geneSetD2")
-geneSets <- GeneSetCollection(d1.sig, d2.sig)#,b.sig)
+geneSets <- GeneSetCollection(d1.sig, d2.sig, b.sig)
 
 ###### Download  data
 #a <- readRDS("../data/circulation_spatial/integrated.gfp.b.rds")
 fibro <- readRDS("./objects/integrated/integrated.fb.rds")
 no.fibro <- readRDS("./objects/integrated/integrated.nofb.rds")
-
-genes.porcentage <- 0.25*length(fibro@assays[["SCT"]]@counts@Dimnames[[1]])
 
 ###### Check intersect genes B and object
 b.fibro <- intersect(fibro@assays[["SCT"]]@data@Dimnames[[1]], B)
@@ -52,7 +51,7 @@ no.fibro.new.counts <- GetAssayData(no.fibro@assays[["SCT"]])[b.no.fibro,]
 no.fibro.new <- CreateSeuratObject(counts =no.fibro.new.counts, assay = "RNA")
 
 #objects <- c(fibro, no.fibro)
-objects <- c(fibro.new, no.fibro.new)
+objects <- c(fibro, no.fibro)
 names(objects) <- c("fibro", "no.fibro")
 
 ###############################################333
@@ -73,7 +72,7 @@ for (i in 1:length(objects)){
   d2 <- as.vector(a@meta.data[["geneSetD2"]])
   d1.d2 <- log10(d1/d2)
   d1.d2[is.na(d1.d2)] = 0
-  a@meta.data[["relation_log.d1.d2"]] <- d1.d2
+  a@meta.data[["d1.d2"]] <- d1.d2
   ##save object
   saveRDS(a,file = paste0("./results/ssGSEA/all_genes/",names(objects[i]),".rds"))
   #feature_plot
@@ -91,8 +90,8 @@ for (i in 1:length(objects)){
 
 ###################################################PLOTS
 
-fibro.new <- readRDS("./results/ssGSEA/all_genes/fibro.b.rds")
-no.fibro.new <- readRDS("./results/ssGSEA/all_genes/no.fibro.b.rds")
+fibro.new <- readRDS("./results/ssGSEA/all_genes/fibro.rds")
+no.fibro.new <- readRDS("./results/ssGSEA/all_genes/no.fibro.rds")
 
 ####add image info
 fibro.new@images <- fibro@images
@@ -106,24 +105,24 @@ no.fibro.new@reductions <- no.fibro@reductions
 
 #Density plots
 
-dens <- c("geneSetD1","geneSetD2", "relation_log.d1.d2")#,"geneSetB")
+dens <- c("geneSetD1","geneSetD2", "d1.d2","geneSetB")
 
 ##fibro
 for (i in dens){
-  pdf(file.path("./results/Aucell/B_genes/",filename = paste(i,"dens.fibro.b.pdf",sep="")))
+  pdf(file.path("./results/ssGSEA/all_genes/",filename = paste(i,"dens.fibro.pdf",sep="")))
   print(dittoRidgePlot(fibro.new, i, group.by = "sample"))
   dev.off()
 }
 
 ##no fibro
 for (i in dens){
-  pdf(file.path("./results/Aucell/B_genes/",filename = paste(i,"dens.no.fibro.b.pdf",sep="")))
+  pdf(file.path("./results/ssGSEA/all_genes/",filename = paste(i,"dens.no.fibro.pdf",sep="")))
   print(dittoRidgePlot(no.fibro.new, i, group.by = "sample"))
   dev.off()
 }
 
 
-####Check best values to plot spatial
+####Check best values to plot spatial STANDARIZED#############################3
 meta <- fibro.new@meta.data
 dpi3 <- meta[grepl("dpi3", meta[,6]),]
 dpi3_b <- as.vector(dpi3$geneSetB)
@@ -136,7 +135,7 @@ dpi3_b_z <- standardize(dpi3_b, centerFun = mean, scaleFun = sd)
 hist(dpi3_b_z)
 
 meta <- fibro.new@meta.data
-meta.d1.d2 <- meta$relation_log.d1.d2
+meta.d1.d2 <- meta$d1.d2
 meta.z.d1.d2 <- standardize(meta.d1.d2, centerFun = mean, scaleFun = sd)
 hist(meta.z.d1.d2)
 fibro.new@meta.data$d1.d2 <- meta.z.d1.d2
@@ -147,8 +146,8 @@ re <- colorRampPalette(c("mistyrose", "red2","darkred"))(200)
 library("GiNA")
 myPalette <- colorRampPalette(rev(brewer.pal(11, "Spectral")))
 
-feature.list <- c("geneSetD1","geneSetD2")#,"geneSetB")
-b <- c(0.4,0.65)
+feature.list <- c("geneSetD1","geneSetD2","geneSetB")
+b <- c(1000,4000)
 feature.list <- c("d1.d2")
 b <- c(-2,2)
 feature.list <- c("relation_log.d1.d2")
@@ -156,11 +155,12 @@ b <- c(-0.1,0.2)
 
 ##fibro
 for (i in feature.list){
-  pdf(file.path("./results/Aucell/B_genes/",filename = paste(i,"dens.fibro.z.pdf",sep="")))
+  pdf(file.path("./results/ssGSEA/all_genes/",filename = paste(i,"dens.fibro.z.pdf",sep="")))
   print(dittoRidgePlot(fibro.new, i, group.by = "sample"))
   dev.off()
 }
 
+##################################
 
 for (i in feature.list){
   p1 <- SpatialFeaturePlot(fibro.new, features = i, combine = FALSE)
@@ -168,7 +168,7 @@ for (i in feature.list){
   #fix.p1 <- scale_fill_gradientn(colours=myPalette(100),breaks=b, labels = c("min", "max"),limits = b)
   p2 <- lapply(p1, function (x) x + fix.p1)
   
-  pdf(file.path("./results/Aucell/B_genes/",filename = paste(i,"spatial.b.pdf",sep="")))
+  pdf(file.path("./results/ssGSEA/all_genes/",filename = paste(i,"spatial.pdf",sep="")))
   print(CombinePlots(p2))
   dev.off()
 }
