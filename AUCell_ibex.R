@@ -1,4 +1,4 @@
-### SCRIPT: AUCell method enrichement analysis Tokio data in IBEX
+### SCRIPT: AUCell method enrichement analysis Circulation data in IBEX
 
 ## 03.03.22 Laura Sudupe , git @lsudupe
 
