@@ -4,35 +4,36 @@
 
 ## https://www.waltermuskovic.com/2021/04/15/seurat-s-addmodulescore-function/
 
-##CHOOSE THE auxMaxRank
-#genes.porcentage <-  210#porcentage depending number of genes in spatial
+
+###### libraries
+library("Seurat")
+library("GSEABase")
+library("ggplot2")
+library("escape")
+library("dittoSeq")
+library("dichromat")
+
 
 ###### Read the gene sets
-genes.velocity <- read.csv("./data/genes_velocity.csv", header = TRUE, sep = ",")
-B <- read.table("./data/clustB_signature.txt", header = FALSE)
-B <- as.vector(B$V1)
-D1 <- as.vector(genes.velocity$Dynamics_1)
-D2 <- as.vector(genes.velocity$Dynamics_2)
-D2[D2 == ""] <- NA 
-D2 <- D2[!is.na(D2)]
+#genes.velocity <- read.csv("./data/genes_velocity.csv", header = TRUE, sep = ",")
+#B <- read.table("./data/clustB_signature.txt", header = FALSE)
+#B <- as.vector(B$V1)
+#D1 <- as.vector(genes.velocity$Dynamics_1)
+#D2 <- as.vector(genes.velocity$Dynamics_2)
+#D2[D2 == ""] <- NA 
+#D2 <- D2[!is.na(D2)]
 
 ##create list
-sig.list <- list(B, D1, D2)
-names(sig.list) <- c("B", "D1", "D2")
-saveRDS(sig.list, "../data/sig.list.rds")
+#sig.list <- list(B, D1, D2)
+#names(sig.list) <- c("B", "D1", "D2")
+#saveRDS(sig.list, "./data/sig.list.rds")
 
 ##our gene list
 sig.list <- readRDS("./data/sig.list.rds")
 B <- sig.list[1]
 D1 <- sig.list[2]
 D2 <- sig.list[3]
-
-###### Create genesets
-b.sig <- GeneSet(B, setName="geneSetB")
-d1.sig <- GeneSet(D1, setName="geneSetD1")
-d2.sig <- GeneSet(D2, setName="geneSetD2")
-geneSets <- GeneSetCollection(d1.sig, d2.sig, b.sig)
-
+               
 ###### Download  data
 #a <- readRDS("../data/circulation_spatial/integrated.gfp.b.rds")
 fibro <- readRDS("./objects/integrated/integrated.fb.rds")
@@ -55,12 +56,11 @@ no.fibro.new <- CreateSeuratObject(counts =no.fibro.new.counts, assay = "RNA")
 objects <- c(fibro, no.fibro)
 names(objects) <- c("fibro", "no.fibro")
 
-
 ###############################################333
 for (i in 1:length(objects)){
   ###matrix
   a <- objects[[i]]
-  a@assays[["SCT"]]@counts <- a@assays[["SCT"]]@data
+  #a@assays[["SCT"]]@counts <- a@assays[["SCT"]]@data
   ###### addModuleScore score 
   a <- AddModuleScore(a, features = B, assay = "SCT", name = "geneSetB_")
   a <- AddModuleScore(a, features = D1, assay = "SCT", name = "geneSetD1_")
@@ -79,7 +79,7 @@ for (i in 1:length(objects)){
 
 ###################################################
 
-fibro.new <- readRDS("./results/moudule_score/all_genes/fibro.rds")
+fibro.new <- readRDS("./results/module_score/all_genes/fibro.rds")
 no.fibro.new <- readRDS("./results/module_score/all_genes/no.fibro.rds")
 
 ####add image info
@@ -94,7 +94,7 @@ no.fibro.new@reductions <- no.fibro@reductions
 
 #Density plots
 
-dens <- c("geneSetD1","geneSetD2", "d1.d2","geneSetB")
+dens <- c("geneSetD1_1","geneSetD2_1", "relation_log.d1.d2","geneSetB_1")
 
 ##fibro
 for (i in dens){
@@ -135,12 +135,12 @@ re <- colorRampPalette(c("mistyrose", "red2","darkred"))(200)
 library("GiNA")
 myPalette <- colorRampPalette(rev(brewer.pal(11, "Spectral")))
 
-feature.list <- c("geneSetD1_","geneSetD2_","geneSetB_")
-b <- c(1000,4000)
+feature.list <- c("geneSetD1_1","geneSetD2_1","geneSetB_1")
+b <- c(0,0.7)
 feature.list <- c("d1.d2")
 b <- c(-2,2)
 feature.list <- c("relation_log.d1.d2")
-b <- c(-0.1,0.2)
+b <- c(-2,2)
 
 ##fibro
 for (i in feature.list){
