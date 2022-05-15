@@ -37,25 +37,24 @@ library(Seurat)
 remotes::install_github("kueckelj/SPATA2")
 library(SPATA2)
 
-fibro <- readRDS("./objects/integrated/integrated.fb.rds")
-control <- fibro
-dpi3 <- fibro
-dpi5_female <- fibro
-dpi5_male <- fibro
+fibro <- readRDS("./objects/integrated/integrated.sct.rds")
+
 
 ###subset the data
 control_s <- subset(fibro, subset = sample == "control")
-
+dpi3 <- subset(fibro, subset = sample == "dpi3")
+dpi5_female <- subset(fibro, subset = sample == "dpi5_female")
+dpi5_male <- subset(fibro, subset = sample == "dpi5_male")
 
 ###create spata object
-control_spata <- transformSeuratToSpata(
-  control_s,
-  sample_name = "control",
+dpi3_spata <- transformSeuratToSpata(
+  dpi3,
+  sample_name = "dpi3",
   method = "spatial",
   coords_from = "pca",
   assay_name = "SCT",
   assay_slot = NULL,
-  image_name = "control",
+  image_name = "dpi3",
   gene_set_path = NULL,
   verbose = TRUE
 )
@@ -63,6 +62,6 @@ control_spata <- transformSeuratToSpata(
 
 #https://rdrr.io/github/kueckelj/SPATA2/man/transformSeuratToSpata.html
 
-
-createSegmentation(fibro)
+SPATA2::createSegmentation(dpi3_spata)
+SPATA2::plotSegmentation(object = dpi3_spata)
 
