@@ -31,18 +31,38 @@ library(tidyverse)
 library(patchwork)
 
 library(monocle3)
+library(Seurat)
+
+#install.packages("remotes")
+remotes::install_github("kueckelj/SPATA2")
+library(SPATA2)
 
 fibro <- readRDS("./objects/integrated/integrated.fb.rds")
+control <- fibro
+dpi3 <- fibro
+dpi5_female <- fibro
+dpi5_male <- fibro
+
+###subset the data
+control_s <- subset(fibro, subset = sample == "control")
 
 
-spata_obj <- initiateSpataObject_10X(input_path = "./data/infarto_5dpi_hembra/",
-                                    sample_names= c("integrated"),
-                                    gene_set_path = fibro)
+###create spata object
+control_spata <- transformSeuratToSpata(
+  control_s,
+  sample_name = "control",
+  method = "spatial",
+  coords_from = "pca",
+  assay_name = "SCT",
+  assay_slot = NULL,
+  image_name = "control",
+  gene_set_path = NULL,
+  verbose = TRUE
+)
 
-https://rdrr.io/github/kueckelj/SPATA2/man/transformSeuratToSpata.html
 
+#https://rdrr.io/github/kueckelj/SPATA2/man/transformSeuratToSpata.html
 
-fibro <- loadSpataObject("./objects/integrated/integrated.fb.rds")
 
 createSegmentation(fibro)
 
