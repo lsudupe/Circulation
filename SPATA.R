@@ -59,6 +59,9 @@ dpi3_spata <- transformSeuratToSpata(
   verbose = TRUE
 )
 
+dpi3_spata <- SPATA2::createSegmentation(dpi3_spata)
+SPATA2::plotSegmentation(object = dpi3_spata)
+plotSurface(object = dpi3_spata, color_by = "segmentation")
 
 #https://rdrr.io/github/kueckelj/SPATA2/man/transformSeuratToSpata.html
 
