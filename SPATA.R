@@ -85,6 +85,8 @@ dpi5_female_spata <- transformSeuratToSpata(
   verbose = TRUE
 )
 
+
+############save and read object
 saveRDS(dpi3_spata, "./objects/spata/dpi3_spata.rds")
 saveRDS(dpi5_female_spata, "./objects/spata/dpi5_female_spata.rds")
 saveRDS(dpi5_male_spata, "./objects/spata/dpi5_male_spata.rds")
@@ -96,8 +98,15 @@ dpi5_male_spata <- readRDS("./objects/spata/dpi5_male_spata.rds")
 
 dpi5_male_spata <- SPATA2::createSegmentation(dpi5_male_spata)
 SPATA2::plotSegmentation(object = dpi5_male_spata)
-plotSurface(object = dpi3_spata, color_by = "segmentation")
+plotSurface(object = dpi5_male_spata, color_by = "segmentation")
 
-SPATA2::createSegmentation(dpi3_spata)
-SPATA2::plotSegmentation(object = dpi3_spata)
 
+#############spata to seurat object
+seurat <- transformSpataToSeurat(prueba, assay_name = "SCT")
+
+pdf(file.path("./results/spata/",filename = "segmentation.pdf"))
+SpatialPlot(seurat, group.by = c("segmentation"),label = TRUE, combine = FALSE)
+dev.off()
+
+prueba <- prueba@fdata[["dpi5_male"]][["segmentation"]]
+levels(your_df$Category1) <- c("Factor 1", "Factor 2", "Factor 3")
