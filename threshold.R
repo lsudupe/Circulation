@@ -21,14 +21,49 @@ print(dittoRidgePlot(GFP, i, group.by = "sample",add.line = 10,min=0, max=100))#
 dev.off()
 
 ###Where is my 99 threshold
-data <- dittoRidgePlot(GFP, i, group.by = "seurat_clusters",split.by = "sample")
-data <- as.data.frame(data[["data"]])
-control <- data[grepl("control", data[,4]),]
-counts.control <- as.vector(control$var.data)
-counts.all <- as.vector(data$var.data)
+control <- subset(GFP, subset = sample == "control")
+counts.control <- t(as.data.frame(control@assays[["SCT"]]@counts))
+gfp <- counts.control[,"GFP"]
+hist(gfp)
+quantile <- quantile(gfp, probs = c(0.99)) #171 es 99%, 96 es 95%
 
-quantile(counts.control, prob)
-quantile <- quantile(counts.control, probs = c(0.99)) #171.3 es 99%, 96 es 95%
+counts.total <- t(as.data.frame(GFP@assays[["SCT"]]@counts))
+gfp <- counts.total[,"GFP"]
+dataframe <- as.data.frame(gfp)
+dataframe <- dataframe %>% mutate(ident =
+                       case_when(gfp >= 8 ~ "FB", 
+                                 gfp < 8 ~ "no.FB")
+)
+
+threshold <- as.factor(dataframe$ident)
+GFP@meta.data["gfp"] <- gfp
+GFP@meta.data["threshold"] <- threshold
+
+prueba <- fibro
+prueba@meta.data["threshold"] <- threshold
+
+saveRDS(prueba, "./objects/threshold/prueba.gfp.rds")
+
+bl <- colorRampPalette(c("navy","royalblue","lightskyblue"))(200)                      
+re <- colorRampPalette(c("mistyrose", "red2","darkred"))(200)
+
+pdf(file.path("./results/threshold/",filename = "all_spot_gfp.pdf"))
+SpatialPlot(prueba, group.by = c("threshold"),label = TRUE, combine = FALSE)
+dev.off()
+
+#####create data.frame
+dataframe <- as.data.frame(gfp)
+
+
+
+data <- dittoRidgePlot(GFP, i, group.by = "sample",split.by = "sample")
+data <- as.data.frame(data[["data"]])
+control <- data[grepl("control", data[,6]),]
+counts.control <- as.vector(control$var.data)
+
+quantile <- quantile(counts.control, probs = c(0.95)) #10 es 99%, 96 es 95%
+
+
 
 ggplot(data, aes(x=var.data, colour=sample)) +
   geom_density() +
@@ -106,6 +141,16 @@ counts.control <- as.vector(control$FB)
 
 quantile <- quantile(counts.control, probs = c(0.99)) #0.519 es 99% fb, 0.658 no fb 99, 0.481 no.fib 0.01%
 
+
+deco.frame <- matrix %>% mutate(deco =
+                                    case_when(FB >= 0.519 ~ "FB", 
+                                              FB < 0.519 ~ "no.FB")
+)
+
+deco.thres <- as.factor(deco.frame$deco)
+prueba@meta.data["deco"] <- deco.thres
+
+saveRDS(prueba, "./objects/threshold/prueba.gfp.rds")
 
 i <- "FB"
 pdf(file.path("./results/threshold/",filename = paste(i,"deco.0.0.fibro.cluster.threshold.pdf",sep="")))
