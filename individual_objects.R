@@ -1,4 +1,4 @@
-## SCRIPT: individual analysis spatial samples CIRCULATION project
+## SCRIPT: individual object creation and first analaysis spatial samples CIRCULATION project
 
 ## 05.04.22 Laura Sudupe , git @lsudupe
 
@@ -104,27 +104,5 @@ for (i in dens){
   dev.off()
 }
 
-meta <-  dpi5_male@meta.data
-write.csv(meta, "./results/individual/meta.dpi5_male.csv")
-enrichment.meta <- read.csv( "./data/infarto_5dpi_hembra/Enrichment.csv")
-enrichment.meta <- as.vector(enrichment.meta$Enrichment)
 
-dpi5_female@meta.data["segmen"] <- as.factor(enrichment.meta)
-d1d2 <- as.vector(dpi5_female@meta.data[["relation_log.d1.d2"]])
 
-library(robustHD)
-library(data.table)
-d1d2<- standardize(d1d2, centerFun = mean, scaleFun = sd)
-dpi5_female@meta.data["d1d2"] <- d1d2
-
-SpatialPlot(dpi5_female, group.by = c("segmen"),label = TRUE, combine = FALSE)
-
-pdf(file.path("./results/individual/",filename = paste("d1d2.esta.boxplot.pdf",sep="")))
-dpi5_female@meta.data%>% 
-  ggplot(aes(x=d1d2, y= segmen, fill=segmen)) + 
-  geom_boxplot() +  
-  theme_classic() +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
-  xlim(-2.5, 2) +
-  theme(plot.title = element_text(hjust=0.5, face="bold"))
-dev.off()
