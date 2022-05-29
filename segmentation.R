@@ -64,6 +64,9 @@ nombres <- c("IZ","BZ_1","BZ_2","BZ_3","BZ_2_3","BZ_4","RZ")
 colors <- c("coral4", "skyblue", "red", "darkgreen", "yellow","khaki2", "darkolivegreen", "gray89")
 names(colors)  <- nombres
 
+dpi5_male@meta.data[["segmen"]] <- factor(dpi5_male@meta.data[["segmen"]],
+                       levels = c("IZ","BZ_1","BZ_2","BZ_3","BZ_2_3","BZ_4","RZ"),ordered = TRUE)
+
 ####################dpi3
 SpatialPlot(dpi3, group.by = c("segmen"),label = TRUE, combine = FALSE)
 
@@ -98,12 +101,20 @@ dev.off()
 
 pdf(file.path("./results/individual/dpi5_male",filename = paste("prueba..pdf",sep="")))
   dpi5_male@meta.data%>% 
-  ggplot(aes(x=d1d2, y= segmen, fill=segmen)) + 
-  geom_boxplot() +  
-  scale_color_manual(colScale) +
-  theme_classic() +
+    ggplot(aes(x=geneSetB, y= segmen, fill=segmen)) + 
+    geom_boxplot(aes(fill=segmen)) +  
+    scale_fill_manual(values =colors ) + 
+    theme_classic() +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
-  xlim(-0.5, 0.5) +
+  #xlim(-0.5, 0.5) +
   theme(plot.title = element_text(hjust=0.5, face="bold")) 
 dev.off()
 
+dpi5_female@meta.data%>% 
+  ggplot(aes(x=geneSetB, y= segmen, fill=segmen)) + 
+  geom_boxplot(aes(fill=segmen)) +  
+  scale_fill_manual(values =colors ) + 
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
+  #xlim(-0.5, 0.5) +
+  theme(plot.title = element_text(hjust=0.5, face="bold")) 
