@@ -35,6 +35,9 @@ dpi3_IZ_BZ <- Seurat::FindMarkers(object = dpi3,
 saveRDS(dpi3_IZ_RZ, "./results/DE/dpi3_IZ_RZ.rds")
 saveRDS(dpi3_IZ_BZ, "./results/DE/dpi3_IZ_BZ.rds")
 
+write.csv(dpi3_IZ_RZ,"./results/DE/dpi3_IZ_RZ.csv", row.names = TRUE)
+write.csv(dpi3_IZ_BZ,"./results/DE/dpi3_IZ_BZ.csv", row.names = TRUE)
+
 ########################dpi5_female
 unique(dpi5_female@meta.data[["segmen"]])
 Idents(dpi5_female) <- (dpi5_female@meta.data[["segmen"]])
@@ -51,6 +54,9 @@ dpi5_female_IZ_BZ <- Seurat::FindMarkers(object = dpi5_female,
 
 saveRDS(dpi5_female_IZ_RZ, "./results/DE/dpi5_female_IZ_RZ.rds")
 saveRDS(dpi5_female_IZ_BZ, "./results/DE/dpi5_female_IZ_BZ.rds")
+
+write.csv(dpi5_female_IZ_RZ,"./results/DE/dpi5_female_IZ_RZ.csv", row.names = TRUE)
+write.csv(dpi5_female_IZ_BZ,"./results/DE/dpi5_female_IZ_BZ.csv", row.names = TRUE)
 
 
 ########################dpi5_male
@@ -69,6 +75,9 @@ dpi5_male_IZ_BZ <- Seurat::FindMarkers(object = dpi5_male,
 
 saveRDS(dpi5_male_IZ_RZ, "./results/DE/dpi5_male_IZ_RZ.rds")
 saveRDS(dpi5_male_IZ_BZ, "./results/DE/dpi5_male_IZ_BZ.rds")
+
+write.csv(dpi5_male_IZ_RZ,"./results/DE/dpi5_male_IZ_RZ.csv", row.names = TRUE)
+write.csv(dpi5_male_IZ_BZ,"./results/DE/dpi5_male_IZ_BZ.csv", row.names = TRUE)
 
 
 
