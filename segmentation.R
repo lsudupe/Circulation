@@ -28,7 +28,7 @@ dpi3@meta.data["d1d2"] <- d1d2
 saveRDS(dpi3, "./objects/individual/segmentation/dpi3.seg.rds")
 
 ######dpi5_female
-enrichment.meta <- read.csv( "./data/dpi5_female/Enrichment.csv")
+enrichment.meta <- read.csv( "./data/dpi5_female/enrichment_2.csv")
 enrichment.meta <- as.vector(enrichment.meta$Enrichment)
 
 dpi5_female@meta.data["segmen"] <- as.factor(enrichment.meta)
