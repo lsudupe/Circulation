@@ -46,6 +46,27 @@ saveRDS(dpi5_male, "./objects/individual/dpi5_male.rds")
 DimPlot(control, group.by = c("seurat_clusters"), label = T) + ggtitle("UMAP_r0.4")
 SpatialPlot(dpi5_male, group.by = c("seurat_clusters"),label = TRUE, combine = FALSE)
 
+###### Read the gene sets###################
+genes.velocity <- read.csv("./data/genes_velocity.csv", header = TRUE, sep = ",")
+B <- read.table("./data/clustB_signature.txt", header = FALSE)
+B <- as.vector(B$V1)
+D1 <- as.vector(genes.velocity$Dynamics_1)
+D2 <- as.vector(genes.velocity$Dynamics_2)
+D2[D2 == ""] <- NA 
+D2 <- D2[!is.na(D2)]
+
+###### Create genesets
+b.sig <- GeneSet(B, setName="geneSetB")
+d1.sig <- GeneSet(D1, setName="geneSetD1")
+d2.sig <- GeneSet(D2, setName="geneSetD2")
+
+
+#Create geneSet for FB
+fb.genes <- read.csv("./results/DE/top200_tokio_FB.csv")
+fb.genes <- as.vector(top.200.de$gene)
+fb.sig <- GeneSet(fb.genes, setName="geneSetFB")
+geneSets <- GeneSetCollection(d1.sig, d2.sig,b.sig, fb.sig)
+
 objects <- c(control, dpi3, dpi5_female, dpi5_male)
 names(objects) <- c("control", "dpi3","dpi5_female","dpi5_male")
 
@@ -59,7 +80,7 @@ for (i in 1:length(objects)){
   ###### AUC score 
   cells_rankings <- AUCell_buildRankings(matrix, nCores=1)#, plotStats=TRUE)
   #rankings <- getRanking(cells_rankings)
-  cells_AUC <- AUCell_calcAUC(geneSets, cells_rankings,aucMaxRank=genes.porcentage)
+  cells_AUC <- AUCell_calcAUC(geneSets, cells_rankings,aucMaxRank=nrow(cells_rankings)*0.25)
   #extract AUC values
   auc_per_cell_all <- as.data.frame(t(getAUC(cells_AUC)))
   #calculate relation d1/d2
@@ -93,16 +114,6 @@ dpi3 <- readRDS("./results/individual/dpi3.rds")
 dpi5_female <- readRDS("./results/individual/dpi5_female.rds")
 dpi5_male <- readRDS("./results/individual/dpi5_male.rds")
 
-
-dens <- c("geneSetD1","geneSetD2", "relation_log.d1.d2","geneSetB")
-
-library("dittoSeq")
-##fibro
-for (i in dens){
-  pdf(file.path("./results/individual/",filename = paste(i,"dens.dpi5_male.pdf",sep="")))
-  print(dittoRidgePlot(dpi5_male, i, group.by = "sample"))
-  dev.off()
-}
 
 
 
