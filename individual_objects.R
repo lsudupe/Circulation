@@ -5,7 +5,8 @@
 #Libraries---------------------------------
 library(Seurat)
 library(dplyr)
-library(ggplot2)
+library("GSEABase")
+library("AUCell")
 
 ###Read data
 control <- readRDS("./objects/initial/control_noGFP.rds")
@@ -63,7 +64,7 @@ d2.sig <- GeneSet(D2, setName="geneSetD2")
 
 #Create geneSet for FB
 fb.genes <- read.csv("./results/DE/top200_tokio_FB.csv")
-fb.genes <- as.vector(top.200.de$gene)
+fb.genes <- as.vector(fb.genes$gene)
 fb.sig <- GeneSet(fb.genes, setName="geneSetFB")
 geneSets <- GeneSetCollection(d1.sig, d2.sig,b.sig, fb.sig)
 
