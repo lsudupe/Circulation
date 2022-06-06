@@ -5,11 +5,12 @@
 #Libraries---------------------------------
 library(Seurat)
 library(dplyr)
+library(ggplot2)
 library("GSEABase")
+library("AUCell")
 
 #Read sc data Tokio
 tokio <- readRDS("./objects/sc/Tokio/sc.combined.sct.fibro.rds")
-
 
 ########################select genes for the FB signature
 
@@ -30,7 +31,8 @@ top.200.de <- de_subset %>%
 top_n(n = 200,
      wt = avg_log2FC)
 #Save
-write.csv(top.200.de,"./results/DE/top200_tokio_FB.rds", row.names = FALSE)
+write.csv(top.200.de,"./results/DE/top200_tokio_FB.csv", row.names = FALSE)
+fb.genes <- read.csv("./results/DE/top200_tokio_FB.csv")
 
 #Create geneSet for FB
 fb.genes <- as.vector(top.200.de$gene)
@@ -50,32 +52,50 @@ FB.B <- b.fibro <- intersect(fb.genes, B)
 FB.D1 <- b.fibro <- intersect(fb.genes, D1)
 FB.D2 <- b.fibro <- intersect(fb.genes, D2)
 
-##########################################3
 
-control <- readRDS("./results/individual/control.rds")
-dpi3 <- readRDS("./results/individual/dpi3.rds")
-dpi5_female <- readRDS("./results/individual/dpi5_female.rds")
-dpi5_male <- readRDS("./results/individual/dpi5_male.rds")
+####Read the data
+#control <- readRDS("./objects/individual/segmentation/dpi5_male.seg.rds")
 
-objects <- c(control, dpi3, dpi5_female, dpi5_male)
-names(objects) <- c("control", "dpi3","dpi5_female","dpi5_male")
+dpi3 <- readRDS("./objects/individual/segmentation/dpi3.seg.rds")
+dpi5_female <- readRDS("./objects/individual/segmentation/dpi5_female.seg.rds")
+dpi5_male <- readRDS("./objects/individual/segmentation/dpi5_male.seg.rds")
+
+
+objects <- c(dpi3, dpi5_female, dpi5_male )
+names(objects) <- c("dpi3", "dpi5_female", "dpi5_male")
 
 ###############################################333
 for (i in 1:length(objects)){
   ###matrix
   a <- objects[[i]]
-  a@assays[["SCT"]]@counts <- a@assays[["SCT"]]@data
-  matrix <- a@assays[["SCT"]]@counts
-  matrix <- as.matrix(matrix)
-  ###### AUC score 
-  cells_rankings <- AUCell_buildRankings(matrix, nCores=1)#, plotStats=TRUE)
-  #rankings <- getRanking(cells_rankings)
-  cells_AUC <- AUCell_calcAUC(fb.sig, cells_rankings,aucMaxRank=genes.porcentage)
-  #extract AUC values
-  auc_per_cell_all <- as.data.frame(t(getAUC(cells_AUC)))
-  ##save meta
-  a <- AddMetaData(a, auc_per_cell_all)
-  saveRDS(a,file = paste0("./results/individual/",names(objects[i]),"FB.rds"))
+  meta <- a@meta.data
+  lm <- lm(meta$geneSetB ~ meta$geneSetFB, data =meta)
+  residuals <- lm$residuals
+  a@meta.data[["residualsB"]] <- residuals
+  saveRDS(a,file = paste0("./results/results_regressout/",names(objects[i]),".B.rds"))
+  #feature_plot
+  #p1 <- SpatialFeaturePlot(a, features = "nCount_SCT", combine = FALSE)
+  #fix.p1 <- scale_fill_continuous(limits = c(0,25000), 
+  #                     	      breaks = c(0,25000),
+  #                              type = "viridis")
+  #p2 <- lapply(p1, function (x) x + fix.p1)
   
-}
+  #pdf(paste(names(objects[i]),"count.dens.pdf",sep=""))
+  #pdf("count.dens.pdf")
+  #print(CombinePlots(p2))
+  #dev.off()
+}         
+
+###################################################PLOTS
+
+dpi3 <- readRDS("./results/results_regressout/dpi3.B.rds")
+dpi5_female <- readRDS("./results/results_regressout/dpi5_female.B.rds")
+dpi5_male <- readRDS("./results/results_regressout/dpi5_male.B.rds")
+
+
+
+
+
+
+
 
