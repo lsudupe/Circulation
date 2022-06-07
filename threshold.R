@@ -21,7 +21,25 @@ print(dittoRidgePlot(GFP, i, group.by = "sample",add.line = 10,min=0, max=100))#
 dev.off()
 
 ###Where is my 99 threshold
-control <- subset(GFP, subset = sample == "control")
+control_g <- subset(GFP, subset = sample == "control")
+dpi3_g <- subset(GFP, subset = sample == "dpi3")
+dpi5_female_g <- subset(GFP, subset = sample == "dpi5_female")
+dpi5_male_g <- subset(GFP, subset = sample == "dpi5_male")
+
+dpi3_gfp <- dpi3_g@meta.data[["gfp"]]
+dpi5_female_gfp <- dpi5_female_g@meta.data[["gfp"]]
+dpi5_male_gfp <- dpi5_male_g@meta.data[["gfp"]]
+
+dpi3@meta.data[["gfp"]] <- dpi3_gfp
+dpi5_female@meta.data[["gfp"]] <- dpi5_female_gfp
+dpi5_male@meta.data[["gfp"]] <- dpi5_male_gfp
+
+saveRDS(dpi3,"./objects/individual/segmentation/dpi3.seg.rds")
+saveRDS(dpi5_female,"./objects/individual/segmentation/dpi5_female.seg.rds")
+saveRDS(dpi5_male,"./objects/individual/segmentation/dpi5_male.seg.rds")
+
+
+
 counts.control <- t(as.data.frame(control@assays[["SCT"]]@counts))
 gfp <- counts.control[,"GFP"]
 hist(gfp)
@@ -117,7 +135,7 @@ spatial_min_0 <- spatial
 decon_mtrx_sub_min_0 <- decon_mtrx_sub
 decon_mtrx_min0 <- decon_mtrx
 
-decon_mtrx_sub_min_0[decon_mtrx_sub_min_0 < 0.0] <- 0
+decon_mtrx_sub_min_0[decon_mtrx_sub_min_0 < 0.1] <- 0
 decon_mtrx_min0 <- cbind(decon_mtrx_sub_min_0, "res_ss" = decon_mtrx_min0[, "res_ss"])
 
 decon_df_min0 <- decon_mtrx_min0 %>%
