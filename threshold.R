@@ -20,25 +20,39 @@ pdf(file.path("./results/threshold/",filename = paste(i,"threshold.sample.line.p
 print(dittoRidgePlot(GFP, i, group.by = "sample",add.line = 10,min=0, max=100))#,split.by = "sample"))
 dev.off()
 
+###gfp protein porcentage
+gfp_total <- GFP@meta.data[["gfp"]]
+
+gfp_porcentage <- (gfp_total/sum(gfp_total))*100
+
 ###Where is my 99 threshold
 control_g <- subset(GFP, subset = sample == "control")
 dpi3_g <- subset(GFP, subset = sample == "dpi3")
 dpi5_female_g <- subset(GFP, subset = sample == "dpi5_female")
 dpi5_male_g <- subset(GFP, subset = sample == "dpi5_male")
 
-dpi3_gfp <- dpi3_g@meta.data[["gfp"]]
-dpi5_female_gfp <- dpi5_female_g@meta.data[["gfp"]]
-dpi5_male_gfp <- dpi5_male_g@meta.data[["gfp"]]
 
-dpi3@meta.data[["gfp"]] <- dpi3_gfp
-dpi5_female@meta.data[["gfp"]] <- dpi5_female_gfp
-dpi5_male@meta.data[["gfp"]] <- dpi5_male_gfp
+####each porcentage
+control_gfp <- control_g@meta.data[["gfp"]]
+control_gfp_porcentage <- (control_gfp/sum(control_gfp))*100
+
+dpi3_gfp <- dpi3_g@meta.data[["gfp"]]
+dpi3_gfp_porcentage <- (dpi3_gfp/sum(dpi3_gfp))*100
+
+dpi5_female_gfp <- dpi5_female_g@meta.data[["gfp"]]
+dpi5_female_gfp_porcentage <- (dpi5_female_gfp/sum(dpi5_female_gfp))*100
+
+dpi5_male_gfp <- dpi5_male_g@meta.data[["gfp"]]
+dpi5_male_gfp_porcentage <- (dpi5_male_gfp/sum(dpi5_male_gfp))*100
+
+
+dpi3@meta.data[["gfp"]] <- dpi3_gfp_porcentage
+dpi5_female@meta.data[["gfp"]] <- dpi5_female_gfp_porcentage
+dpi5_male@meta.data[["gfp"]] <- dpi5_male_gfp_porcentage
 
 saveRDS(dpi3,"./objects/individual/segmentation/dpi3.seg.rds")
 saveRDS(dpi5_female,"./objects/individual/segmentation/dpi5_female.seg.rds")
 saveRDS(dpi5_male,"./objects/individual/segmentation/dpi5_male.seg.rds")
-
-
 
 counts.control <- t(as.data.frame(control@assays[["SCT"]]@counts))
 gfp <- counts.control[,"GFP"]
