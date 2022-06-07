@@ -72,6 +72,12 @@ for (i in 1:length(objects)){
   lm <- lm(meta$geneSetB ~ meta$geneSetFB, data =meta)
   residuals <- lm$residuals
   a@meta.data[["residualsB"]] <- residuals
+  lm <- lm(meta$geneSetD1 ~ meta$geneSetFB, data =meta)
+  residuals <- lm$residuals
+  a@meta.data[["residualsD1"]] <- residuals
+  lm <- lm(meta$geneSetD2 ~ meta$geneSetFB, data =meta)
+  residuals <- lm$residuals
+  a@meta.data[["residualsD2"]] <- residuals
   saveRDS(a,file = paste0("./results/results_regressout/",names(objects[i]),".B.rds"))
   #feature_plot
   #p1 <- SpatialFeaturePlot(a, features = "nCount_SCT", combine = FALSE)
@@ -92,6 +98,28 @@ dpi3 <- readRDS("./results/results_regressout/dpi3.B.rds")
 dpi5_female <- readRDS("./results/results_regressout/dpi5_female.B.rds")
 dpi5_male <- readRDS("./results/results_regressout/dpi5_male.B.rds")
 
+
+###################Spatial plots
+install.packages("colorspace")
+#https://cran.r-project.org/web/packages/colorspace/vignettes/colorspace.html#Installation
+library(colorspace)
+q4 <- colorspace::sequential_hcl(7, palette = "Plasma")
+
+feature.list <- c("geneSetB")
+b <- c(0,0.8)
+
+#########B
+
+#for (i in feature.list){
+  p1 <- SpatialFeaturePlot(dpi3, features = "geneSetB", combine = FALSE)
+  #fix.p1 <- scale_fill_gradientn(colours=c(bl,"white", re), na.value = "grey98",limits = b,breaks=b, labels = c("min", "max"))
+  fix.p1 <- scale_fill_gradientn(colours=q4,breaks=b, labels = c("min", "max"),limits = b)
+  p2 <- lapply(p1, function (x) x + fix.p1)
+  
+#  pdf(file.path("./results_regressout/",filename = paste(i,"spatial.resB.dpi3.pdf",sep="")))
+  print(CombinePlots(p2))
+#  dev.off()
+#}
 
 
 
