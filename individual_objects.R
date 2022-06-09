@@ -115,6 +115,47 @@ dpi3 <- readRDS("./results/individual/dpi3.rds")
 dpi5_female <- readRDS("./results/individual/dpi5_female.rds")
 dpi5_male <- readRDS("./results/individual/dpi5_male.rds")
 
+objects <- c(control, dpi3, dpi5_female, dpi5_male)
+names(objects) <- c("control", "dpi3","dpi5_female","dpi5_male")
+
+###### Read the gene sets
+marina_nine <- read.delim("./data/cluster9_markers.txt")
+#Top100 marina
+top100 <- marina_nine %>%
+  #group_by(cluster) %>%
+  top_n(n = 100,
+        wt = avg_log2FC)
+
+top100 <- cbind(genes = rownames(top100), top100)
+rownames(top100) <- 1:nrow(top100)
+top100 <- as.vector(top100$genes)
+
+###### Create genesets
+nine.sig <- GeneSet(top100, setName="geneSet9")
+
+############################Cluster nine enrichment score
+for (i in 1:length(objects)){
+  ###matrix
+  a <- objects[[i]]
+  a@assays[["SCT"]]@counts <- a@assays[["SCT"]]@data
+  matrix <- a@assays[["SCT"]]@counts
+  matrix <- as.matrix(matrix)
+  ###### AUC score 
+  cells_rankings <- AUCell_buildRankings(matrix, nCores=1)#, plotStats=TRUE)
+  #rankings <- getRanking(cells_rankings)
+  cells_AUC <- AUCell_calcAUC(nine.sig, cells_rankings,aucMaxRank=nrow(cells_rankings)*0.25)
+  #extract AUC values
+  auc_per_cell_all <- as.data.frame(t(getAUC(cells_AUC)))
+  ##save meta
+  a <- AddMetaData(a, auc_per_cell_all)
+  saveRDS(a,file = paste0("./results/individual/",names(objects[i]),".nine.rds"))
+  
+}
+
+control <- readRDS("./results/individual/control.nine.rds")
+dpi3 <- readRDS("./results/individual/dpi3.nine.rds")
+dpi5_female <- readRDS("./results/individual/dpi5_female.nine.rds")
+dpi5_male <- readRDS("./results/individual/dpi5_male.nine.rds")
 
 
 
