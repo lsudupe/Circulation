@@ -44,7 +44,7 @@ combined <- merge(control, y = c(dpi3, dpi5_female, dpi5_male ),
 
 ##Visualization
 # Visualize the number of spots counts per sample
-png(file.path("./results/QC",filename = "Number of spot per sample.png"))
+pdf(file.path("./results/QC",filename = "Number of spot per sample.pdf"))
 combined@meta.data%>% 
   ggplot(aes(x=sample, fill=sample)) + 
   geom_bar() +
@@ -55,7 +55,7 @@ combined@meta.data%>%
 dev.off()
 
 # Visualize the distribution of genes detected per spot via boxplot
-png(file.path("./results/QC",filename = "genes detected per spot boxplot.png"))
+pdf(file.path("./results/QC",filename = "genes detected per spot boxplot.pdf"))
 combined@meta.data %>% 
   ggplot(aes(x=sample, y=log10(nFeature_Spatial), fill=sample)) + 
   geom_boxplot() + 
@@ -66,7 +66,7 @@ combined@meta.data %>%
 dev.off()
 
 # Visualize the distribution of mitochondrial gene expression detected per spot
-png(file.path("./results/QC",filename = "mito percentage per spot.png"))
+pdf(file.path("./results/QC",filename = "mito percentage per spot.pdf"))
 combined@meta.data %>% 
   ggplot(aes(color=sample, x=percent_mito, fill=sample)) + 
   geom_density(alpha = 0.2) + 
