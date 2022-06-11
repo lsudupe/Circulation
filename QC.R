@@ -97,6 +97,15 @@ combined@meta.data %>%
 dev.off()
 
 
+# Visualize the overall complexity of the gene expression by visualizing the genes detected per UMI (novelty score)
+pdf(file.path("./results/QC",filename = "genes detected per UMI novelty score.pdf"))
+combined@meta.data %>% 
+  ggplot(aes(x=log10GenesPerUMI, color = sample, fill=sample)) +
+  geom_density(alpha = 0.2) +
+  theme_classic() +
+  geom_vline(xintercept = 0.8)
+dev.off()
+
 ##########SPATIAL plots
 
 feature.list <- c("nCount_Spatial", "nFeature_Spatial","percent_mito", "log10GenesPerUMI")
