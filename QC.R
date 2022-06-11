@@ -75,6 +75,17 @@ combined@meta.data %>%
   geom_vline(xintercept = 0.2)
 dev.off()
 
+# Visualize the number UMIs/transcripts per cell
+pdf(file.path("./results/QC",filename = "number UMIs sati transcripts per cell.pdf"))
+combined@meta.data %>% 
+  ggplot(aes(color=sample, x=nCount_Spatial, fill=sample)) + 
+  geom_density(alpha = 0.2) + 
+  scale_x_log10() + 
+  theme_classic() +
+  ylab("Cell density") +
+  geom_vline(xintercept = 500)
+dev.off()
+
 
 ##########SPATIAL plots
 
