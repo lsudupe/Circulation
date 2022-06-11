@@ -68,7 +68,7 @@ dev.off()
 # Visualize the distribution of genes detected per spot via histogram
 pdf(file.path("./results/QC",filename = "genes detected per spot histogram.pdf"))
 combined@meta.data %>% 
-  ggplot(aes(color=sample, y=nFeature_Spatial, fill=sample)) + 
+  ggplot(aes(color=sample, x=nFeature_Spatial, fill=sample)) + 
   geom_density(alpha = 0.2) + 
   theme_classic() +
   scale_x_log10() + 
