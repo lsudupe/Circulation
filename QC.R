@@ -246,3 +246,13 @@ combined <- merge(control, y = c(dpi3, dpi5_female, dpi5_male ),
 
 #####save combined
 saveRDS(combined,"./objects/initial/combined_noGFP.rds")
+
+# Filter out low quality cells using selected thresholds - these will change with experiment
+filtered_combined <- subset(x = combined, 
+                          subset= (nCount_Spatial >= 500) & 
+                            (nFeature_Spatial >= 250) & 
+                            (log10GenesPerUMI > 0.80) & 
+                            (percent_mito < 55.0))
+
+#####save combined
+saveRDS(filtered_combined,"./objects/initial/combined_noGFP_filtered.rds")
