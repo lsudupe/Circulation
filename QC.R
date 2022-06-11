@@ -65,6 +65,16 @@ combined@meta.data %>%
   ggtitle("Ngenes vs Npots")
 dev.off()
 
+# Visualize the distribution of genes detected per spot via histogram
+pdf(file.path("./results/QC",filename = "genes detected per spot histogram.pdf"))
+combined@meta.data %>% 
+  ggplot(aes(color=sample, y=nFeature_Spatial, fill=sample)) + 
+  geom_density(alpha = 0.2) + 
+  theme_classic() +
+  scale_x_log10() + 
+  geom_vline(xintercept = 300)
+dev.off()
+
 # Visualize the distribution of mitochondrial gene expression detected per spot
 pdf(file.path("./results/QC",filename = "mito percentage per spot.pdf"))
 combined@meta.data %>% 
