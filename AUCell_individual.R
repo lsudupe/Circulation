@@ -68,12 +68,12 @@ for (i in 1:length(objects)){
   #extract AUC values
   auc_per_cell_all <- as.data.frame(t(getAUC(cells_AUC)))
   #calculate relation d1/d2
-  d1 <- as.vector(auc_per_cell_all$geneSetD1)
-  d2 <- as.vector(auc_per_cell_all$geneSetD2)
+  d1 <- as.vector(auc_per_cell_all$geneSetDA)
+  d2 <- as.vector(auc_per_cell_all$geneSetDB)
   d1.d2 <- log10(d1/d2)
   is.na(d1.d2) <-sapply(d1.d2, is.infinite)
   d1.d2[is.na(d1.d2)] = 0
-  auc_per_cell_all$ratio(DA.DB) <- d1.d2
+  auc_per_cell_all$ratio_dinamics <- d1.d2
   ##save meta
   a <- AddMetaData(a, auc_per_cell_all)
   saveRDS(a,file = paste0("./results/individual/",names(objects[i]),".enrich.rds"))
