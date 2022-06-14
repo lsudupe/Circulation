@@ -85,3 +85,22 @@ dpi3 <- readRDS("./results/individual/dpi3.enrich.rds")
 dpi5_female <- readRDS("./results/individual/dpi5_female.enrich.rds")
 dpi5_male <- readRDS("./results/individual/dpi5_male.enrich.rds")
 
+#####ratio estand
+
+b <- standardize(control@meta.data[["ratio_dinamics"]], centerFun = mean, scaleFun = sd)
+control@meta.data[["ratio_stand"]] <- b
+
+b <- standardize(dpi3@meta.data[["ratio_dinamics"]], centerFun = mean, scaleFun = sd)
+dpi3@meta.data[["ratio_stand"]] <- b
+
+b <- standardize(dpi5_female@meta.data[["ratio_dinamics"]], centerFun = mean, scaleFun = sd)
+dpi5_female@meta.data[["ratio_stand"]] <- b
+
+b <- standardize(dpi5_male@meta.data[["ratio_dinamics"]], centerFun = mean, scaleFun = sd)
+dpi5_male@meta.data[["ratio_stand"]] <- b
+
+
+saveRDS(control, "./results/individual/control.enrich.rds")
+saveRDS(dpi3, "./results/individual/dpi3l.enrich.rds")
+saveRDS(dpi5_female, "./results/individual/dpi5_female.enrich.rds")
+saveRDS(dpi5_male, "./results/individual/dpi5_male.enrich.rds")
