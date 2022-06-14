@@ -42,6 +42,40 @@ saveRDS(dpi5_female, "./objects/individual/dpi5_female.rds")
 saveRDS(dpi5_male, "./objects/individual/dpi5_male.rds")
 
 
+################################normalize gfp
+
+control_gfp <- readRDS("./objects/initial/control_sp.rds")
+dpi3_gfp <- readRDS("./objects/initial/dpi3_sp.rds")
+dpi5_female_gfp <- readRDS("./objects/initial/dpi5_female_sp.rds")
+dpi5_male_gfp <- readRDS("./objects/initial/dpi5_male_sp.rds")
 
 
+control_gfp <- SCTransform(control_gfp, assay = "Spatial", verbose = FALSE) %>%
+  RunPCA(assay = "SCT",npcs = 30, verbose = FALSE) %>%
+  RunUMAP(reduction = "pca", dims = 1:30, verbose = FALSE)%>%
+  FindNeighbors(reduction = "pca", dims = 1:30) %>%
+  FindClusters(resolution = 0.4)
+
+dpi3_gfp <- SCTransform(dpi3_gfp, assay = "Spatial", verbose = FALSE) %>%
+  RunPCA(assay = "SCT",npcs = 30, verbose = FALSE) %>%
+  RunUMAP(reduction = "pca", dims = 1:30, verbose = FALSE)%>%
+  FindNeighbors(reduction = "pca", dims = 1:30) %>%
+  FindClusters(resolution = 0.4)
+
+dpi5_female_gfp <- SCTransform(dpi5_female_gfp, assay = "Spatial", verbose = FALSE) %>%
+  RunPCA(assay = "SCT",npcs = 30, verbose = FALSE) %>%
+  RunUMAP(reduction = "pca", dims = 1:30, verbose = FALSE)%>%
+  FindNeighbors(reduction = "pca", dims = 1:30) %>%
+  FindClusters(resolution = 0.4)
+
+dpi5_male_gfp <- SCTransform(dpi5_male_gfp, assay = "Spatial", verbose = FALSE) %>%
+  RunPCA(assay = "SCT",npcs = 30, verbose = FALSE) %>%
+  RunUMAP(reduction = "pca", dims = 1:30, verbose = FALSE)%>%
+  FindNeighbors(reduction = "pca", dims = 1:30) %>%
+  FindClusters(resolution = 0.4)
+
+saveRDS(control_gfp, "./objects/individual/control_gfp.rds")
+saveRDS(dpi3_gfp, "./objects/individual/dpi3_gfp.rds")
+saveRDS(dpi5_female_gfp, "./objects/individual/dpi5_female_gfp.rds")
+saveRDS(dpi5_male_gfp, "./objects/individual/dpi5_male_gfp.rds")
 
