@@ -25,8 +25,8 @@ D2 <- D2[!is.na(D2)]
 
 ###### Create genesets
 b.sig <- GeneSet(B, setName="geneSetB")
-d1.sig <- GeneSet(D1, setName="geneSetD1")
-d2.sig <- GeneSet(D2, setName="geneSetD2")
+d1.sig <- GeneSet(D1, setName="geneSetDA")
+d2.sig <- GeneSet(D2, setName="geneSetDB")
 
 #Create geneSet for FB
 fb.genes <- read.csv("./results/DE/top200_tokio_FB.csv")
@@ -73,7 +73,7 @@ for (i in 1:length(objects)){
   d1.d2 <- log10(d1/d2)
   is.na(d1.d2) <-sapply(d1.d2, is.infinite)
   d1.d2[is.na(d1.d2)] = 0
-  auc_per_cell_all$relation_log.d1.d2 <- d1.d2
+  auc_per_cell_all$ratio(DA.DB) <- d1.d2
   ##save meta
   a <- AddMetaData(a, auc_per_cell_all)
   saveRDS(a,file = paste0("./results/individual/",names(objects[i]),".enrich.rds"))
