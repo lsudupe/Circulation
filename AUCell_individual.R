@@ -131,7 +131,7 @@ dpi5_male_gfp <- dpi5_male_g@meta.data[["gfp"]]
 dpi5_male_gfp_porcentage <- (dpi5_male_gfp/sum(dpi5_male_gfp))*100
 
 ###add values to out object
-control@meta.data[["gfp"]] <- dpi3_gfp_porcentage
+control@meta.data[["gfp"]] <- control_gfp_porcentage
 dpi3@meta.data[["gfp"]] <- dpi3_gfp_porcentage
 dpi5_female@meta.data[["gfp"]] <- dpi5_female_gfp_porcentage
 dpi5_male@meta.data[["gfp"]] <- dpi5_male_gfp_porcentage
