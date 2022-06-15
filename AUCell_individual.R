@@ -104,3 +104,40 @@ saveRDS(control, "./results/individual/control.enrich.rds")
 saveRDS(dpi3, "./results/individual/dpi3l.enrich.rds")
 saveRDS(dpi5_female, "./results/individual/dpi5_female.enrich.rds")
 saveRDS(dpi5_male, "./results/individual/dpi5_male.enrich.rds")
+
+
+#####gfp
+###Read the data
+GFP <- readRDS("objects/integrated/integrated.sct.GFP.rds")
+
+###gfp protein porcentage
+gfp_total <- GFP@meta.data[["gfp"]]
+gfp_porcentage <- (gfp_total/sum(gfp_total))*100
+
+##subset GFP objetc
+control_g <- subset(GFP, subset = sample == "control")
+dpi3_g <- subset(GFP, subset = sample == "dpi3")
+dpi5_female_g <- subset(GFP, subset = sample == "dpi5_female")
+dpi5_male_g <- subset(GFP, subset = sample == "dpi5_male")
+
+####each porcentage
+control_gfp <- control_g@meta.data[["gfp"]]
+control_gfp_porcentage <- (control_gfp/sum(control_gfp))*100
+dpi3_gfp <- dpi3_g@meta.data[["gfp"]]
+dpi3_gfp_porcentage <- (dpi3_gfp/sum(dpi3_gfp))*100
+dpi5_female_gfp <- dpi5_female_g@meta.data[["gfp"]]
+dpi5_female_gfp_porcentage <- (dpi5_female_gfp/sum(dpi5_female_gfp))*100
+dpi5_male_gfp <- dpi5_male_g@meta.data[["gfp"]]
+dpi5_male_gfp_porcentage <- (dpi5_male_gfp/sum(dpi5_male_gfp))*100
+
+###add values to out object
+control@meta.data[["gfp"]] <- dpi3_gfp_porcentage
+dpi3@meta.data[["gfp"]] <- dpi3_gfp_porcentage
+dpi5_female@meta.data[["gfp"]] <- dpi5_female_gfp_porcentage
+dpi5_male@meta.data[["gfp"]] <- dpi5_male_gfp_porcentage
+
+####save objects
+saveRDS(control, "./results/individual/control.enrich.rds")
+saveRDS(dpi3, "./results/individual/dpi3l.enrich.rds")
+saveRDS(dpi5_female, "./results/individual/dpi5_female.enrich.rds")
+saveRDS(dpi5_male, "./results/individual/dpi5_male.enrich.rds")
