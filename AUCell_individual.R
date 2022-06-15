@@ -7,6 +7,7 @@ library(Seurat)
 library(dplyr)
 library("GSEABase")
 library("AUCell")
+library(robustHD)
 
 ###Read data
 control <- readRDS("./objects/individual/control.rds")
@@ -101,7 +102,7 @@ dpi5_male@meta.data[["ratio_stand"]] <- b
 
 
 saveRDS(control, "./results/individual/control.enrich.rds")
-saveRDS(dpi3, "./results/individual/dpi3l.enrich.rds")
+saveRDS(dpi3, "./results/individual/dpi3.enrich.rds")
 saveRDS(dpi5_female, "./results/individual/dpi5_female.enrich.rds")
 saveRDS(dpi5_male, "./results/individual/dpi5_male.enrich.rds")
 
