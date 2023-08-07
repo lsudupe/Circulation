@@ -298,17 +298,19 @@ for (i in BZ2_genes){
   dev.off()
 }
 
-for (i in RZ_genes){
+for (i in BZ2_genes){
   library(BuenColors)
   color <- jdb_palette("brewer_spectra")
-  b <- c(min(combined@meta.data[[i]]), max(combined@meta.data[[i]]))
+  gene_values <- combined@assays$SCT@data[i, ]
+  # Get min and max
+  b <- c(min(gene_values, na.rm = TRUE), max(gene_values, na.rm = TRUE))
   p1 <- SpatialFeaturePlot(combined, features = i,  combine = FALSE, ncol = 2)
   fix.p1 <- scale_fill_gradientn(colours=color,
                                  breaks=b,
                                  labels=c("Min","Max"),
                                  limits = b)
   p2 <- lapply(p1, function (x) x + fix.p1)
-  pdf(paste0("./Circulation/results/Adrian.genes/silvia.december/individual/areas/",i,"_RZ.pdf",sep=""))
+  pdf(paste0("./Circulation/results/Adrian.genes/silvia.december/individual/areas/",i,"_BZ2.pdf",sep=""))
   print(CombinePlots(p2))
   dev.off()
 }
