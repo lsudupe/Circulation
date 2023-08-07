@@ -286,11 +286,19 @@ for (i in 1:length(new)){
 ###################################################
 ##### Check individually
 
-RZ_genes <- c("Myh6","Mhrt", "Lpl", "Tnnt2")
+RZ_genes <- c("Myh6", "Lpl", "Tnnt2")
 BZ1_genes <- c("Nppa", "Ankrd1", "Shroom3", "Clu", "Xirp2")
 BZ2_genes <- c("Xirp2", "Flnc", "Cd44")
 
 for (i in BZ2_genes){
+  library(BuenColors)
+  color <- jdb_palette("brewer_spectra")
+  pdf(paste0("./Circulation/results/Adrian.genes/silvia.december/individual/areas/",i,"_BZ2.pdf",sep=""))
+  print(SpatialFeaturePlot(combined, features = i,  combine = TRUE, ncol = 2))
+  dev.off()
+}
+
+for (i in RZ_genes){
   library(BuenColors)
   color <- jdb_palette("brewer_spectra")
   b <- c(min(combined@meta.data[[i]]), max(combined@meta.data[[i]]))
@@ -300,24 +308,10 @@ for (i in BZ2_genes){
                                  labels=c("Min","Max"),
                                  limits = b)
   p2 <- lapply(p1, function (x) x + fix.p1)
-  pdf(paste0("./Circulation/results/Adrian.genes/silvia.december/individual/areas/",i,"_BZ2.pdf",sep=""))
+  pdf(paste0("./Circulation/results/Adrian.genes/silvia.december/individual/areas/",i,"_RZ.pdf",sep=""))
   print(CombinePlots(p2))
   dev.off()
 }
-
-
-######
-b <- c(min(heart_Uscore@meta.data[["ratio"]]), max(heart_Uscore@meta.data[["ratio"]]))
-p1 <- SpatialFeaturePlot(heart_Uscore, features = c("ratio"),  combine = FALSE, ncol = 2)
-fix.p1 <- scale_fill_gradientn(colours=color,
-                               breaks=b,
-                               labels=c("Min","Max"),
-                               limits = b)
-p2 <- lapply(p1, function (x) x + fix.p1)
-
-pdf(paste("./Circulation/results/Adrian.genes/silvia.december/Ucell/geneset/ratio/ratio_.pdf",sep=""))
-print(CombinePlots(p2))
-dev.off()
 
 
 #####
