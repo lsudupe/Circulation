@@ -75,7 +75,7 @@ pdf(paste0("./Circulation/results/areas_check/rz.pdf",sep=""))
 print(CombinePlots(p2))
 dev.off()
 
-b <- c(min(combined@meta.data[["signature_1_bz1"]]), max(combined@meta.data[["signature_1_rz"]]))
+b <- c(min(combined@meta.data[["signature_1_bz1"]]), max(combined@meta.data[["signature_1_bz1"]]))
 p1 <- SpatialFeaturePlot(combined, features = c("signature_1_bz1"),  combine = FALSE, ncol = 1)
 fix.p1 <- scale_fill_gradientn(colours=color,
                                breaks=b,
@@ -87,7 +87,7 @@ pdf(paste0("./Circulation/results/areas_check/bz1.pdf",sep=""))
 print(CombinePlots(p2))
 dev.off()
 
-b <- c(min(combined@meta.data[["signature_1_bz2"]]), max(combined@meta.data[["signature_1_rz"]]))
+b <- c(min(combined@meta.data[["signature_1_bz2"]]), max(combined@meta.data[["signature_1_bz2"]]))
 p1 <- SpatialFeaturePlot(combined, features = c("signature_1_bz2"),  combine = FALSE, ncol = 1)
 fix.p1 <- scale_fill_gradientn(colours=color,
                                breaks=b,
@@ -100,7 +100,7 @@ print(CombinePlots(p2))
 dev.off()
 
 
-b <- c(min(combined@meta.data[["signature_1_iz"]]), max(combined@meta.data[["signature_1_rz"]]))
+b <- c(min(combined@meta.data[["signature_1_iz"]]), max(combined@meta.data[["signature_1_iz"]]))
 p1 <- SpatialFeaturePlot(combined, features = c("signature_1_iz"),  combine = FALSE, ncol = 1)
 fix.p1 <- scale_fill_gradientn(colours=color,
                                breaks=b,
