@@ -133,8 +133,67 @@ gene_scores <- CreateAssayObject(t(combined@meta.data[,c("RZ_genes", "BZ1_genes"
 combined[["genescores"]] <- gene_scores
 
 
+#####CM or IZ?
+# Set the identity class for the object
+Idents(combined) <- "sample"
+# Subset by specific samples, for example, "control" and "dpi3"
+combined_control <- subset(combined, idents = "control")
+combined_dpi3 <- subset(combined, idents = "dpi3")
+combined_dpi5f <- subset(combined, idents = "dpi5_female")
+combined_dpi5m <- subset(combined, idents = "dpi5_male")
+
+# Create a histogram for the CM score
+hist(combined$CM_Score, breaks = 30)
+
+# Create a dataframe for ggplot
+data <- data.frame(type = c(rep("control", length(combined_control$CM_Score)), 
+                            rep("dpi3", length(combined_dpi3$CM_Score)), 
+                            rep("dpi5_female", length(combined_dpi5f$CM_Score)), 
+                            rep("dpi5_male", length(combined_dpi5m$CM_Score))),
+                   value = c(combined_control$CM_Score, 
+                             combined_dpi3$CM_Score, 
+                             combined_dpi5f$CM_Score, 
+                             combined_dpi5m$CM_Score))
+
+# Generate the histogram using ggplo
+p <- data %>%
+  ggplot(aes(x = value, fill = type)) +
+  geom_histogram(color = "#e9ecef", alpha = 0.6, position = 'identity') +
+  scale_fill_manual(values = c("control" = "#FF3333", 
+                               "dpi3" = "#00CCCC", 
+                               "dpi5_female" = "#FF9999",  # Choose an appropriate color
+                               "dpi5_male" = "#99CCFF"),   # Choose an appropriate color
+                    name = "Data Type",  # Legend title
+                    breaks = c("control", "dpi3", "dpi5_female", "dpi5_male"),
+                    labels = c("Control", "DPI 3", "DPI 5 Female", "DPI 5 Male")) +
+  labs(fill = "") + xlim(0, 1500) + theme_light() +
+  theme(axis.title.y = element_blank(), axis.title.x = element_blank())
 
 
+# Display the plot
+pdf("./Circulation/results/cm_score/histo.pdf")
+print(p)
+dev.off()
+
+# Perform ROC analysis using Seurat's FindMarkers function
+roc_results <- FindMarkers(combined, ident.1 = "control", ident.2 = "dpi3", test.use = "roc")
+# Generate a violin plot for the CM score
+p <- VlnPlot(combined, "CM_Score", pt.size = -1, cols = c(brewer.pal(8, "Set2")[1:8], brewer.pal(8, "Accent")[1:8])) +
+  theme_classic() +
+  theme(legend.position = "none", axis.text.y = element_blank(), axis.text.x = element_blank(), 
+        axis.title.y = element_blank(), axis.title.x = element_blank(), title = element_text(size = 0))
+
+pdf("./Circulation/results/cm_score/roc.pdf")
+print(p)
+dev.off()
+
+# Subset the Seurat object to include only certain identities
+Idents(combined) <- "seurat_clusters"
+combined_CMs <- subset(combined, idents = c(1:9, 13))  # Adjust these cluster numbers based on your data
+
+# Further subset for the "dpi5_female" and "dpi5_male" groups
+combined_dpi5f <- subset(combined, idents = "dpi5_female")
+combined_dpi5m <- subset(combined, idents = "dpi5_male")
 
 
 
