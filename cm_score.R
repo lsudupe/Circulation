@@ -91,29 +91,68 @@ for (gene_set_name in names(gene_lists)) {
 # Verify the addition of the CM scores to the metadata
 head(combined@meta.data)
 
-
 #####classification
-
 # Find all markers in the combined object
 combined <-PrepSCTFindMarkers(combined)
 zone_markers <- FindAllMarkers(combined, only.pos = TRUE, logfc.threshold = 0.25)
-
 # Get the top 5 markers for each cluster based on average log2 fold change
 top_zone_markers <- zone_markers %>% group_by(cluster) %>% top_n(n = 5, wt = avg_log2FC)
-
 # Plot the heatmap for the top markers with specific cluster colors
 pdf("./Circulation/results/cm_score/one.pdf")
 print(DoHeatmap(combined, features = c(top_zone_markers$gene), 
           group.colors = c("#7570B3", "#BA3859", "#FF0000", "darkgrey", "darkgrey")) + 
   scale_fill_gradientn(colors = c("grey", "white", brewer.pal(8, "Dark2")[3])))
 dev.off()
-
 # Plot the heatmap for the top markers with a broader color palette
 pdf("./Circulation/results/cm_score/two.pdf")
 print(DoHeatmap(combined, features = c(top_zone_markers$gene), 
           group.colors = c(brewer.pal(8, "Set2")[1:8], brewer.pal(8, "Accent")[1:8])) + 
   scale_fill_gradientn(colors = c("grey", "white", brewer.pal(8, "Dark2")[3])))
 dev.off()
+
+#####CM Score
+# For the CM score, you want to take into account all three subclasses: RZ_genes, BZ1_genes, and BZ2_genes.
+# Therefore, we'll combine the genes from all these subclasses to generate the CM score.
+subclass_genes <- c(RZ_genes, BZ1_genes, BZ2_genes) 
+
+# Extract the genes specific to the CM class that are present in your dataset
+genes_in_spatial_and_cluster_class <- subclass_genes[subclass_genes %in% rownames(combined)]
+gene_counts_class <- GetAssayData(combined, assay = "Spatial", slot = "counts")[genes_in_spatial_and_cluster_class, ]
+
+# Compute the CM score
+class_threshold <- 5  # Adjust this threshold based on your data, if necessary
+class_score <- Matrix::colSums(gene_counts_class) / combined@meta.data$nCount_Spatial * 10000
+
+# Add the computed CM score as metadata
+combined <- AddMetaData(combined, class_score, col.name = "CM_Score")
+
+# Create a new assay with the previously computed subclass scores 
+# Adjust column indexes based on your metadata to include the RZ_genes, BZ1_genes, and BZ2_genes scores
+# Create a new assay with the subclass scores
+gene_scores <- CreateAssayObject(t(combined@meta.data[,c("RZ_genes", "BZ1_genes", "BZ2_genes", "CM_Score")]))
+combined[["genescores"]] <- gene_scores
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
