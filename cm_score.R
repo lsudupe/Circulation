@@ -76,7 +76,6 @@ BZ2_genes <- c(
 )
 
 #####Mapping of CM gene-set scorers to visium clusters
-
 # Iterate over each gene list and compute the score
 gene_lists <- list(RZ_genes, BZ1_genes, BZ2_genes)
 names(gene_lists) <- c("RZ_genes", "BZ1_genes", "BZ2_genes")
@@ -171,29 +170,43 @@ p <- data %>%
 
 
 # Display the plot
-pdf("./Circulation/results/cm_score/histo.pdf")
+pdf("./Circulation/results/cm_score/histo_cm_score.pdf")
 print(p)
 dev.off()
 
-# Perform ROC analysis using Seurat's FindMarkers function
-roc_results <- FindMarkers(combined, ident.1 = "control", ident.2 = "dpi3", test.use = "roc")
+#vilinplot
 # Generate a violin plot for the CM score
-p <- VlnPlot(combined, "CM_Score", pt.size = -1, cols = c(brewer.pal(8, "Set2")[1:8], brewer.pal(8, "Accent")[1:8])) +
+p <- VlnPlot(combined, 
+        features = "CM_Score", 
+        pt.size = -1, 
+        group.by = "seurat_clusters", 
+        cols = c(brewer.pal(8, "Set2")[1:8], brewer.pal(8, "Accent")[1:8])) +
   theme_classic() +
-  theme(legend.position = "none", axis.text.y = element_blank(), axis.text.x = element_blank(), 
-        axis.title.y = element_blank(), axis.title.x = element_blank(), title = element_text(size = 0))
-
-pdf("./Circulation/results/cm_score/roc.pdf")
+  theme(legend.position = "none", title = element_text(size = 0))
+pdf("./Circulation/results/cm_score/violin_cm_score.pdf")
 print(p)
 dev.off()
 
-# Subset the Seurat object to include only certain identities
-Idents(combined) <- "seurat_clusters"
-combined_CMs <- subset(combined, idents = c(1:9, 13))  # Adjust these cluster numbers based on your data
+# Plot the CM_Score on the UMAP
+DefaultAssay(combined) <- "Spatial"
+combined <- FindVariableFeatures(combined)
+combined <- ScaleData(combined)
+combined <- RunPCA(combined)
+combined <- RunUMAP(combined, dims = 1:25)
+p1 <- DimPlot(combined, group.by = "seurat_clusters", label = TRUE) + NoLegend() + theme_minimal()
+p2 <- FeaturePlot(combined, "CM_Score") + ggtitle("CM_score")
 
-# Further subset for the "dpi5_female" and "dpi5_male" groups
-combined_dpi5f <- subset(combined, idents = "dpi5_female")
-combined_dpi5m <- subset(combined, idents = "dpi5_male")
+pdf("./Circulation/results/cm_score/dimplot_cm_score.pdf")
+print(p1 | p2)
+dev.off()
+
+# ROC analysis
+roc_results <- FindMarkers(combined, ident.1 = c(5,6), ident.2 = c(4), test.use = "roc")
+print(roc_results)
+
+#Idents(combined) <- "high_resolution"
+#object_integrated_CMs <- subset(combined, idents = c(1:9,13)) #subseting CMs in new object
+
 
 
 
