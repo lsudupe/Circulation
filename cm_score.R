@@ -204,19 +204,113 @@ dev.off()
 roc_results <- FindMarkers(combined, ident.1 = c(5,6), ident.2 = c(4), test.use = "roc")
 print(roc_results)
 
+#in my case, score <350 no RZ
 #Idents(combined) <- "high_resolution"
 #object_integrated_CMs <- subset(combined, idents = c(1:9,13)) #subseting CMs in new object
 
+#####RZ or BZ?
+#dataframe
+data_bz <- data.frame(type = c(rep("control", length(combined_control$BZ1_genes)), 
+                            rep("dpi3", length(combined_dpi3$BZ1_genes)), 
+                            rep("dpi5_female", length(combined_dpi5f$BZ1_genes)), 
+                            rep("dpi5_male", length(combined_dpi5m$BZ1_genes))),
+                   value = c(combined_control$BZ1_genes, 
+                             combined_dpi3$BZ1_genes, 
+                             combined_dpi5f$BZ1_genes, 
+                             combined_dpi5m$BZ1_genes))
+
+# Generate the histogram using ggplo
+p <- data_bz %>%
+  ggplot(aes(x = value, fill = type)) +
+  geom_histogram(color = "#e9ecef", alpha = 0.6, position = 'identity') +
+  scale_fill_manual(values = c("control" = "#FF3333", 
+                               "dpi3" = "#00CCCC", 
+                               "dpi5_female" = "#FF9999",  # Choose an appropriate color
+                               "dpi5_male" = "#99CCFF"),   # Choose an appropriate color
+                    name = "Data Type",  # Legend title
+                    breaks = c("control", "dpi3", "dpi5_female", "dpi5_male"),
+                    labels = c("Control", "DPI 3", "DPI 5 Female", "DPI 5 Male")) +
+  labs(fill = "") + xlim(0, 1500) + theme_light() +
+  theme(axis.title.y = element_blank(), axis.title.x = element_blank())
+
+
+# Display the plot
+pdf("./Circulation/results/cm_score/histo_bz_score.pdf")
+print(p)
+dev.off()
+
+#vilinplot
+# Generate a violin plot for the BZ score
+p <- VlnPlot(combined, 
+             features = "BZ1_genes", 
+             pt.size = -1, 
+             group.by = "seurat_clusters", 
+             cols = c(brewer.pal(8, "Set2")[1:8], brewer.pal(8, "Accent")[1:8])) +
+  theme_classic() +
+  theme(legend.position = "none", title = element_text(size = 0))
+pdf("./Circulation/results/cm_score/violin_bz_score.pdf")
+print(p)
+dev.off()
+
+p1 <- DimPlot(combined, group.by = "seurat_clusters", label = TRUE) + NoLegend() + theme_minimal()
+p2 <- FeaturePlot(combined, "BZ1_genes", cols = c("lightgrey", "darkred")) + ggtitle("BZ_genes")
+
+pdf("./Circulation/results/cm_score/dimplot_bz_score.pdf")
+print(p1 | p2)
+dev.off()
 
 
 
+#####BZ1 or BZ2?
+#dataframe
+data_bz2 <- data.frame(type = c(rep("control", length(combined_control$BZ2_genes)), 
+                               rep("dpi3", length(combined_dpi3$BZ2_genes)), 
+                               rep("dpi5_female", length(combined_dpi5f$BZ2_genes)), 
+                               rep("dpi5_male", length(combined_dpi5m$BZ2_genes))),
+                      value = c(combined_control$BZ2_genes, 
+                                combined_dpi3$BZ2_genes, 
+                                combined_dpi5f$BZ2_genes, 
+                                combined_dpi5m$BZ2_genes))
+
+# Generate the histogram using ggplo
+p <- data_bz2 %>%
+  ggplot(aes(x = value, fill = type)) +
+  geom_histogram(color = "#e9ecef", alpha = 0.6, position = 'identity') +
+  scale_fill_manual(values = c("control" = "#FF3333", 
+                               "dpi3" = "#00CCCC", 
+                               "dpi5_female" = "#FF9999",  # Choose an appropriate color
+                               "dpi5_male" = "#99CCFF"),   # Choose an appropriate color
+                    name = "Data Type",  # Legend title
+                    breaks = c("control", "dpi3", "dpi5_female", "dpi5_male"),
+                    labels = c("Control", "DPI 3", "DPI 5 Female", "DPI 5 Male")) +
+  labs(fill = "") + xlim(0, 1500) + theme_light() +
+  theme(axis.title.y = element_blank(), axis.title.x = element_blank())
 
 
+# Display the plot
+pdf("./Circulation/results/cm_score/histo_bz2_score.pdf")
+print(p)
+dev.off()
 
+#vilinplot
+# Generate a violin plot for the BZ2 score
+p <- VlnPlot(combined, 
+             features = "BZ2_genes", 
+             pt.size = -1, 
+             group.by = "seurat_clusters", 
+             cols = c(brewer.pal(8, "Set2")[1:8], brewer.pal(8, "Accent")[1:8])) +
+  theme_classic() +
+  theme(legend.position = "none", title = element_text(size = 0))
+pdf("./Circulation/results/cm_score/violin_bz2_score.pdf")
+print(p)
+dev.off()
 
+p1 <- DimPlot(combined, group.by = "seurat_clusters", label = TRUE) + NoLegend() + theme_minimal()
+p2 <- FeaturePlot(combined, "BZ2_genes", cols = c("lightgrey", "darkred")) + ggtitle("BZ2_genes")
 
-
-
+pdf("./Circulation/results/cm_score/dimplot_bz2_score.pdf")
+print(p1 | p2)
+dev.off()
 
 
 
