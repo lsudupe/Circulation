@@ -15,6 +15,9 @@ DIR_ROOT <- file.path(getwd())
 DIR_DATA <- file.path(DIR_ROOT, "./Circulation/objects/individual/figures/")
 combined <- readRDS(paste0(DIR_DATA, "combined.rds"))
 
+color <- brewer.pal(11,"Spectral")
+color <- rev(color)
+
 
 # Define the gene lists for each category
 RZ_genes <- c(
@@ -313,14 +316,68 @@ print(p1 | p2)
 dev.off()
 
 
+#save the object
+saveRDS(combined, "./Circulation/objects/combined_cmscore.rds")
+combined <- readRDS("./Circulation/objects/combined_cmscore.rds")
+
+
+##spatial plots
+b <- c(min(combined@meta.data[["CM_Score"]]), max(combined@meta.data[["CM_Score"]]))
+p1 <- SpatialFeaturePlot(combined, features = c("CM_Score"),  combine = FALSE, ncol = 1)
+fix.p1 <- scale_fill_gradientn(colours=color,
+                               breaks=b,
+                               labels=c("Min","Max"),
+                               limits = b)
+p2 <- lapply(p1, function (x) x + fix.p1)
+
+pdf(paste0("./Circulation/results/cm_score/spatial/cm_score.pdf",sep=""))
+print(CombinePlots(p2))
+dev.off()
+
+b <- c(min(combined@meta.data[["BZ1_genes"]]), max(combined@meta.data[["BZ1_genes"]]))
+p1 <- SpatialFeaturePlot(combined, features = c("BZ1_genes"),  combine = FALSE, ncol = 1)
+fix.p1 <- scale_fill_gradientn(colours=color,
+                               breaks=b,
+                               labels=c("Min","Max"),
+                               limits = b)
+p2 <- lapply(p1, function (x) x + fix.p1)
+
+pdf(paste0("./Circulation/results/cm_score/spatial/bz1_score.pdf",sep=""))
+print(CombinePlots(p2))
+dev.off()
+
+b <- c(min(combined@meta.data[["BZ2_genes"]]), max(combined@meta.data[["BZ2_genes"]]))
+p1 <- SpatialFeaturePlot(combined, features = c("BZ2_genes"),  combine = FALSE, ncol = 1)
+fix.p1 <- scale_fill_gradientn(colours=color,
+                               breaks=b,
+                               labels=c("Min","Max"),
+                               limits = b)
+p2 <- lapply(p1, function (x) x + fix.p1)
+
+pdf(paste0("./Circulation/results/cm_score/spatial/bz2_score.pdf",sep=""))
+print(CombinePlots(p2))
+dev.off()
+
+hist(combined@meta.data[["CM_Score"]])
+hist(combined@meta.data[["BZ1_genes"]])
+hist(combined@meta.data[["BZ2_genes"]])
 
 
 
+SpatialFeaturePlot(combined, features = c("BZ1_genes"),  combine = FALSE, ncol = 1)
+
+##thresholds
+x <- combined
+x$new_area <- NA
+x$new_area[x$BZ2_genes > 110] <- "BZ2"
+x$new_area[is.na(x$new_area) & x$BZ1_genes > 200] <- "BZ1"
+x$new_area[is.na(x$new_area) & x$CM_Score < 300] <- "IZ"
+x$new_area[is.na(x$new_area)] <- "RZ"
 
 
 
-
-
-
+SpatialDimPlot(x, group.by = "new_area",  combine = TRUE, ncol = 2)
+cross_tab <- table(x@meta.data[["sample"]], x@meta.data[["new_area"]])
+print(cross_tab)
 
 
