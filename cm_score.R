@@ -380,4 +380,21 @@ SpatialDimPlot(x, group.by = "new_area",  combine = TRUE, ncol = 2)
 cross_tab <- table(x@meta.data[["sample"]], x@meta.data[["new_area"]])
 print(cross_tab)
 
+##thresholds 2way
+x <- combined
+
+x$new_area <- NA
+x$new_area[x$CM_Score < 300] <- "IZ"
+x$new_area[is.na(x$new_area) & x$BZ1_genes > 200] <- "BZ"
+x$new_area[is.na(x$new_area)] <- "RZ"
+x$new_area[x$new_area == "BZ" & x$BZ2_genes > 115] <- "BZ2"
+x$new_area[x$new_area == "BZ"] <- "BZ1"
+
+
+
+
+SpatialDimPlot(x, group.by = "new_area",  combine = TRUE, ncol = 2)
+cross_tab <- table(x@meta.data[["sample"]], x@meta.data[["new_area"]])
+print(cross_tab)
+
 
