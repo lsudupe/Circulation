@@ -390,6 +390,7 @@ x$new_area[is.na(x$new_area)] <- "RZ"
 x$new_area[x$new_area == "BZ" & x$BZ2_genes > 115] <- "BZ2"
 x$new_area[x$new_area == "BZ"] <- "BZ1"
 
+saveRDS(x,"./Circulation/objects/area/new_areas.RDS")
 
 
 
