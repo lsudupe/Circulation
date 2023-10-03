@@ -721,6 +721,40 @@ print(p)
 dev.off()
 
 
+##### Check if there are diferences between groups using the p-value
 
+# Variables you are interested in
+variables <- c(
+  "ratio", "residuals_b", "residuals_da", "residuals_db",
+  "residuals_nine", "residuals_verde", "residuals_morado",
+  "residuals_five", "residuals_eight", "residuals_eleven"
+)
+
+# Function to perform ANOVA and create a table for a single Seurat object
+create_table <- function(seurat_object) {
+  p_values <- sapply(variables, function(var) {
+    anova_result <- aov(as.formula(paste(var, "~ new_area")), data = seurat_object@meta.data)
+    p_value <- summary(anova_result)[[1]]["new_area", "Pr(>F)"]
+    return(p_value)
+  })
+  table <- data.frame(
+    Variable = variables,
+    P_value = p_values,
+    Significant = p_values < 0.05
+  )
+  return(table)
+}
+
+# Iterate through each Seurat object to create a table
+tables <- lapply(enrich, create_table)
+
+# Now 'tables' is a list where each element is a table for a corresponding Seurat object
+names(tables) <- names(enrich)  # Name the list elements for easy reference
+
+
+control_anova <- tables[["control"]]
+dpi3_anova <- tables[["dpi3"]]
+dpi5f_anova <- tables[["dpi5_female"]]
+dpi5m_anova <- tables[["dpi5_male"]]
 
 
