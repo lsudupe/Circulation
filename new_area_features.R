@@ -154,23 +154,23 @@ for (i in 1:length(objects)){
   ## Add UCellScore
   a <- AddModuleScore_UCell(a, features = v.genes, name = "_verde")
   a <- AddModuleScore_UCell(a, features = m.genes, name = "_morado")
-  a <- AddModuleScore_UCell(a, features = m.genes, name = "_fb")
+  a <- AddModuleScore_UCell(a, features = fb.genes, name = "_fb")
   a <- AddModuleScore_UCell(a, features = nine.genes, name = "_nine")
   a <- AddModuleScore_UCell(a, features = b.genes, name = "_b")
   a <- AddModuleScore_UCell(a, features = da.genes, name = "_da")
   a <- AddModuleScore_UCell(a, features = db.genes, name = "_db")
-  a <- AddModuleScore_UCell(a, features = db.genes, name = "_five")
-  a <- AddModuleScore_UCell(a, features = db.genes, name = "_eight")
-  a <- AddModuleScore_UCell(a, features = db.genes, name = "_eleven")
+  a <- AddModuleScore_UCell(a, features = five.genes, name = "_five")
+  a <- AddModuleScore_UCell(a, features = eight.genes, name = "_eight")
+  a <- AddModuleScore_UCell(a, features = eleven.genes, name = "_eleven")
   
   
   ## Calculate ratio verde/morado
   v <- as.vector(a$signature_1_verde)
   m <- as.vector(a$signature_1_morado)
-  ratio <- log10(m/v)
-  is.na(ratio) <-sapply(ratio, is.infinite)
-  ratio[is.na(ratio)] = 0
-  a$ratio <- ratio
+  ratio.v.m <- log10(m/v)
+  is.na(ratio.v.m) <-sapply(ratio.v.m, is.infinite)
+  ratio.v.m[is.na(ratio.v.m)] = 0
+  a$ratio.v.m <- ratio.v.m
   
   ## Calculate ratio da/db
   da <- as.vector(a$signature_1_da)
@@ -366,9 +366,9 @@ for (i in 1:length(enrich)){
           theme(plot.title = element_text(hjust=0.5, face="bold")))
   dev.off() 
   
-  pdf(file.path(paste0(DIR_RES, names(enrich[i]),"/", names(enrich[i]), "boxplot_ratio.pdf")))
+  pdf(file.path(paste0(DIR_RES, names(enrich[i]),"/", names(enrich[i]), "boxplot_ratio.v.m.pdf")))
   print(a@meta.data%>% 
-          ggplot(aes(x=ratio, y= new_area, fill=new_area)) + 
+          ggplot(aes(x=ratio.v.m, y= new_area, fill=new_area)) + 
           geom_boxplot() +  
           theme_classic() +
           theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
@@ -436,10 +436,21 @@ for (i in 1:length(enrich)){
           theme(plot.title = element_text(hjust=0.5, face="bold")))
   dev.off()
   
-  # ratio
-  pdf(file.path(paste0(DIR_RES, names(enrich[i]),"/", names(enrich[i]), "boxplot_ratio.pdf")))
+  # ratio.v.m
+  pdf(file.path(paste0(DIR_RES, names(enrich[i]),"/", names(enrich[i]), "boxplot_ratio.v.m.pdf")))
   print(a@meta.data%>% 
-          ggplot(aes(x=ratio, y= new_area, fill=new_area)) + 
+          ggplot(aes(x=ratio.v.m, y= new_area, fill=new_area)) + 
+          geom_boxplot() +  
+          theme_classic() +
+          theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
+          #xlim(-0.5, 0.5) +
+          theme(plot.title = element_text(hjust=0.5, face="bold")))
+  dev.off()
+  
+  # ratio.dadb
+  pdf(file.path(paste0(DIR_RES, names(enrich[i]),"/", names(enrich[i]), "boxplot_ratio.dadb.pdf")))
+  print(a@meta.data%>% 
+          ggplot(aes(x=ratio.dadb, y= new_area, fill=new_area)) + 
           geom_boxplot() +  
           theme_classic() +
           theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
@@ -677,25 +688,12 @@ for (i in 1:length(enrich)){
   print(CombinePlots(p2))
   dev.off()
   
-  # ratio
-  b <- c(min(a@meta.data[["ratio"]]), max(a@meta.data[["ratio"]]))
-  p1 <- SpatialFeaturePlot(a, features = c("ratio"),  combine = FALSE, ncol = 1)
-  fix.p1 <- scale_fill_gradientn(colours=color,
-                                 breaks=b,
-                                 labels=c("Min","Max"),
-                                 limits = b)
-  p2 <- lapply(p1, function (x) x + fix.p1)
-  
-  pdf(paste0(DIR_RES,names(enrich[i]), "/", paste(names(enrich[i]), "spatial_ratio.pdf",sep="")))
-  print(CombinePlots(p2))
-  dev.off()
-  
   # ratio red and blue
   bl <- colorRampPalette(c("navy","royalblue","lightskyblue"))(200)                      
   re <- colorRampPalette(c("mistyrose", "red2","darkred"))(200)
   
-  l <- c(min(a@meta.data[["ratio"]]), max(a@meta.data[["ratio"]]))
-  p1 <- SpatialFeaturePlot(a, features = c("ratio"), combine = FALSE, ncol = 2)
+  l <- c(min(a@meta.data[["ratio.v.m"]]), max(a@meta.data[["ratio.v.m"]]))
+  p1 <- SpatialFeaturePlot(a, features = c("ratio.v.m"), combine = FALSE, ncol = 2)
   fix.p1 <- scale_fill_gradientn(colours=c(bl,"white", re),
                                  breaks=b,
                                  labels=c("Min","Max"),
@@ -703,7 +701,24 @@ for (i in 1:length(enrich)){
                                  limits = l)
   p2 <- lapply(p1, function (x) x + fix.p1)
   
-  pdf(paste0(DIR_RES,names(enrich[i]), "/", paste(names(enrich[i]), "spatial_ratio_blue_red.pdf",sep="")))
+  pdf(paste0(DIR_RES,names(enrich[i]), "/", paste(names(enrich[i]), "spatial_ratio.v.m_blue_red.pdf",sep="")))
+  print(CombinePlots(p2))
+  dev.off()
+  
+  # ratio red and blue
+  bl <- colorRampPalette(c("navy","royalblue","lightskyblue"))(200)                      
+  re <- colorRampPalette(c("mistyrose", "red2","darkred"))(200)
+  
+  l <- c(min(a@meta.data[["ratio.dadb"]]), max(a@meta.data[["ratio.dadb"]]))
+  p1 <- SpatialFeaturePlot(a, features = c("ratio.dadb"), combine = FALSE, ncol = 2)
+  fix.p1 <- scale_fill_gradientn(colours=c(bl,"white", re),
+                                 breaks=b,
+                                 labels=c("Min","Max"),
+                                 na.value = "grey98",
+                                 limits = l)
+  p2 <- lapply(p1, function (x) x + fix.p1)
+  
+  pdf(paste0(DIR_RES,names(enrich[i]), "/", paste(names(enrich[i]), "spatial_ratio.dadb_blue_red.pdf",sep="")))
   print(CombinePlots(p2))
   dev.off()
   
@@ -725,36 +740,52 @@ dev.off()
 
 # Variables you are interested in
 variables <- c(
-  "ratio", "residuals_b", "residuals_da", "residuals_db",
+ "residuals_b", "residuals_da", "residuals_db",
   "residuals_nine", "residuals_verde", "residuals_morado",
-  "residuals_five", "residuals_eight", "residuals_eleven"
+  "residuals_five", "residuals_eight", "residuals_eleven",
+  "ratio.dadb", "ratio.v.m"
 )
 
 # Function to perform ANOVA and create a table for a single Seurat object
 create_table <- function(seurat_object) {
+  # Check if all specified columns exist in seurat_object@meta.data
+  all_columns_exist <- all(c("new_area", variables) %in% colnames(seurat_object@meta.data))
+  if (!all_columns_exist) {
+    warning("Not all specified columns exist in seurat_object@meta.data. Skipping this object.")
+    return(NULL)
+  }
+  
+  # Remove rows with missing values in the specified columns
+  complete_data <- seurat_object@meta.data[complete.cases(seurat_object@meta.data[, c("new_area", variables)]), ]
+  
   p_values <- sapply(variables, function(var) {
-    anova_result <- aov(as.formula(paste(var, "~ new_area")), data = seurat_object@meta.data)
+    anova_result <- aov(as.formula(paste(var, "~ new_area")), data = complete_data)
     p_value <- summary(anova_result)[[1]]["new_area", "Pr(>F)"]
     return(p_value)
   })
+  
   table <- data.frame(
     Variable = variables,
     P_value = p_values,
     Significant = p_values < 0.05
   )
+  
   return(table)
 }
 
-# Iterate through each Seurat object to create a table
+# Now re-run the analysis
 tables <- lapply(enrich, create_table)
 
 # Now 'tables' is a list where each element is a table for a corresponding Seurat object
+# or NULL if the Seurat object didn't have all the specified columns
 names(tables) <- names(enrich)  # Name the list elements for easy reference
 
-
+# You can now extract the tables for the Seurat objects that were successfully analyzed
+# For example:
 control_anova <- tables[["control"]]
 dpi3_anova <- tables[["dpi3"]]
 dpi5f_anova <- tables[["dpi5_female"]]
 dpi5m_anova <- tables[["dpi5_male"]]
+
 
 
